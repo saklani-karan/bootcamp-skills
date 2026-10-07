@@ -13,25 +13,35 @@ Agent skills from the [AI Learning Hub skills library](https://ai-learning-hub-7
 | [Chore Chart](skills/chore-chart) | Create a printable weekly chore chart that rotates jobs fairly by age. |
 | [Home Upkeep](skills/home-upkeep) | Create a 12-month home maintenance plan with a printable checklist and a calendar file. |
 
+## Download
+
+Grab ready-to-upload files from the [latest release](https://github.com/saklani-karan/bootcamp-skills/releases/latest):
+
+- `<name>.skill`: load into Claude (Settings → Capabilities → Skills → Upload skill). ChatGPT accepts the same file.
+- `quiz-maker-gem.skill`, `trip-planner-gem.skill`: the lighter Gemini Gem versions, wrapped as Claude skills. They need no code execution, just the instructions and `engine.html`.
+- `<name>-copilot.zip`: Copilot.
+- `<name>-gemini.skill`, `<name>-gem.zip`: Gemini. For a Gem, paste the `.md` instructions into a new Gem and attach `engine.html` as a knowledge file.
+
+In Claude Code, copy a folder from `skills/` into `~/.claude/skills/` instead.
+
 ## Layout
 
 ```
 skills/<name>/        Skill folder (SKILL.md, scripts/, assets/, reference/, tests/, example/)
-gemini-gems/<name>/   Gemini Gem versions where they differ (instructions .md + engine.html)
-dist/claude/          <name>.skill  — upload to Claude (also works for ChatGPT)
-dist/copilot/         <name>.zip    — upload to Copilot
-dist/gemini/          <name>.skill or <name>-gem.zip — upload to Gemini
+gemini-gems/<name>/   Gem instructions (.md) + engine.html, and claude-frontmatter.md used to wrap it as a Claude skill
+dist/                 Built packages (run ./package.sh)
 package.sh            Rebuilds dist/ from skills/ and gemini-gems/
 ```
 
-The Claude, ChatGPT and Copilot packages contain the same files. Gemini uses the same files too, except for Quiz Maker and Itinerary Planner, which ship as Gems.
+The Claude, ChatGPT, Copilot and Gemini packages contain the same files, except Quiz Maker and Itinerary Planner, which also ship as Gems.
 
-## Using a skill
+## Releasing
 
-- **Claude:** Settings → Capabilities → Skills → upload the `.skill` file from `dist/claude/`. In Claude Code, copy the folder into `~/.claude/skills/` instead.
-- **ChatGPT:** upload the same `.skill` file from `dist/claude/`.
-- **Copilot:** upload the `.zip` from `dist/copilot/`.
-- **Gemini:** upload the file from `dist/gemini/`, or for a Gem, paste the `.md` instructions into a new Gem and attach `engine.html`.
+Push a tag and the Release workflow builds every package and attaches it to a GitHub release:
+
+```
+git tag v1.0.0 && git push origin v1.0.0
+```
 
 ## Tests
 

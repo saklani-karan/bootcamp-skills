@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to release (e.g. v1.0.0)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build packages
+        run: ./package.sh
+      - name: Name assets by platform
+        run: |
+          mkdir release
+          cp dist/claude/*.skill release/
+          for f in dist/copilot/*.zip; do cp "$f" "release/$(basename "$f" .zip)-copilot.zip"; done
+          for f in dist/gemini/*; do
+            case "$f" in
+              *-gem.zip) cp "$f" release/ ;;
+              *.skill)   cp "$f" "release/$(basename "$f" .skill)-gemini.skill" ;;
+            esac
+          done
+          ls -1 release
+      - name: Publish release
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "$TAG" --notes-file .github/release-notes.md
+          gh release upload "$TAG" release/* --clobber
