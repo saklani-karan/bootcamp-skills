@@ -1,0 +1,49 @@
+{
+ "id": "test-chores",
+ "title": "Test chores",
+ "weeks": 13,
+ "days": [
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
+  "Sun"
+ ],
+ "builtOn": "7 October 2026",
+ "children": [
+  {
+   "name": "Ana",
+   "age": 11
+  },
+  {
+   "name": "Ben",
+   "age": 9
+  },
+  {
+   "name": "Cy",
+   "age": 4
+  }
+ ],
+ "chores": [
+  "set-table",
+  "toys-away",
+  "unload-dishwasher",
+  "vacuum",
+  "trash-out",
+  {
+   "title": "Feed the fish",
+   "min_age": 4,
+   "effort": 1,
+   "how_often": "daily"
+  }
+ ],
+ "exclusions": [
+  {
+   "child": "Ben",
+   "chore": "toys-away",
+   "why": "test"
+  }
+ ]
+}

@@ -1,0 +1,148 @@
+{
+ "id": "test-bbq",
+ "title": "Test BBQ",
+ "units": "us",
+ "arrive": "2026-10-17T13:00",
+ "depart": "2026-10-17T20:00",
+ "groups": {
+  "regular": 18,
+  "vegetarian": 4
+ },
+ "stores": [
+  {
+   "name": "Costco"
+  },
+  {
+   "name": "Safeway"
+  }
+ ],
+ "meals": [
+  {
+   "id": "lunch",
+   "name": "Grill lunch",
+   "start": "2026-10-17T15:00",
+   "menu": [
+    {
+     "dish": "Burgers",
+     "for": [
+      "regular"
+     ]
+    },
+    {
+     "dish": "Halloumi skewers",
+     "for": [
+      "vegetarian"
+     ]
+    },
+    {
+     "dish": "Corn",
+     "for": [
+      "everyone"
+     ]
+    }
+   ]
+  }
+ ],
+ "shopping": [
+  {
+   "item": "Ground beef",
+   "store": "Costco",
+   "section": "Meat",
+   "for": [
+    "regular"
+   ],
+   "meals": [
+    "lunch"
+   ],
+   "calc": {
+    "fn": "meat",
+    "cut": "ground"
+   },
+   "pack": {
+    "size": 5,
+    "unit": "lb",
+    "price": 24.99
+   },
+   "check": true
+  },
+  {
+   "item": "Halloumi",
+   "store": "Safeway",
+   "section": "Vegetarian",
+   "for": [
+    "vegetarian"
+   ],
+   "meals": [
+    "lunch"
+   ],
+   "per_person": 0.4,
+   "pack": {
+    "size": 8,
+    "unit": "oz",
+    "price": 6.99
+   },
+   "source": "https://www.safeway.com/"
+  },
+  {
+   "item": "Soda and seltzer",
+   "section": "Drinks",
+   "calc": {
+    "fn": "drinks",
+    "style": "dinner",
+    "sessions": 1
+   },
+   "pack": {
+    "size": 24,
+    "unit": "each",
+    "label": "24-pack",
+    "price": 9.99
+   },
+   "check": true
+  },
+  {
+   "item": "Ice",
+   "store": "Safeway",
+   "section": "Cold",
+   "calc": {
+    "fn": "ice",
+    "profile": "cans"
+   },
+   "pack": {
+    "size": 10,
+    "unit": "lb",
+    "price": 3.49
+   },
+   "check": true
+  },
+  {
+   "item": "Charcoal",
+   "store": "Costco",
+   "section": "Grill",
+   "fixed": 1,
+   "why": "one bag runs the grill all afternoon",
+   "pack": {
+    "size": 1,
+    "unit": "each",
+    "label": "2 × 18 lb",
+    "price": 18.99
+   },
+   "check": true
+  }
+ ],
+ "committed": [
+  {
+   "what": "Bouncy castle",
+   "amount": 180,
+   "status": "paid"
+  },
+  {
+   "what": "Cake",
+   "amount": 75,
+   "status": "estimate"
+  }
+ ],
+ "collected": {
+  "per_head": 15,
+  "payers": 10
+ }
+}

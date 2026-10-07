@@ -1,0 +1,37 @@
+{
+ "id": "test-chores",
+ "title": "Test chores",
+ "weeks": 3,
+ "days": [
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
+  "Sun"
+ ],
+ "builtOn": "7 October 2026",
+ "children": [
+  {
+   "name": "Ana",
+   "age": 11
+  },
+  {
+   "name": "Ben",
+   "age": 9
+  },
+  {
+   "name": "Cy",
+   "age": 4
+  }
+ ],
+ "chores": [],
+ "exclusions": [
+  {
+   "child": "Ben",
+   "chore": "toys-away",
+   "why": "test"
+  }
+ ]
+}

@@ -1,0 +1,64 @@
+{
+  "id": "family-favourites",
+  "title": "Family favourites",
+  "look": {"font": "rounded", "bg": "sunset"},
+  "units": "source",
+  "cards": [
+    {
+      "id": "banana-bread",
+      "title": "Brown Butter Banana Bread",
+      "source": "From Aunt Leena's handwritten card",
+      "serves": 10,
+      "serves_text": "Makes 1 loaf · about 10 slices",
+      "times": [{"label": "Prep", "text": "20 min"}, {"label": "Bake", "text": "55–60 min"}],
+      "ingredients": [
+        {"name": "For the bread", "items": [
+          {"text": "3 very ripe bananas", "qty": "3", "unit": "", "item": "very ripe bananas"},
+          {"text": "½ cup butter, browned and cooled", "qty": "½", "unit": "cup", "item": "butter, browned and cooled"},
+          {"text": "¾ cup brown sugar", "qty": "¾", "unit": "cup", "item": "brown sugar"},
+          {"text": "2 eggs", "qty": "2", "unit": "", "item": "eggs"},
+          {"text": "1 tsp vanilla", "qty": "1", "unit": "tsp", "item": "vanilla"},
+          {"text": "1 1/2 cups plain flour", "qty": "1 1/2", "unit": "cups", "item": "plain flour"},
+          {"text": "1 tsp baking soda", "qty": "1", "unit": "tsp", "item": "baking soda"},
+          {"text": "a pinch of salt", "qty": "", "unit": "", "item": "salt"},
+          {"text": "2–3 tbsp walnuts, chopped (optional)", "qty": "2–3", "unit": "tbsp", "item": "walnuts, chopped (optional)"}
+        ]},
+        {"name": "For the glaze", "items": [
+          {"text": "1 cup icing sugar", "qty": "1", "unit": "cup", "item": "icing sugar"},
+          {"text": "2 tbsp milk", "qty": "2", "unit": "tbsp", "item": "milk"},
+          {"text": "a squeeze of lemon", "qty": "", "unit": "", "item": "lemon"}
+        ]}
+      ],
+      "method": [
+        {"name": "Bread", "steps": [
+          "Heat the oven to 350°F and line a loaf tin.",
+          "Mash the bananas in a big bowl, then stir in the browned butter, sugar, eggs and vanilla.",
+          "Fold in the flour, baking soda and salt until just mixed. Add the walnuts if using.",
+          "Pour into the tin and bake 55–60 minutes, until a skewer comes out clean.",
+          "Cool in the tin for 10 minutes, then on a rack."
+        ]},
+        {"name": "Glaze", "steps": [
+          "Whisk the icing sugar, milk and lemon until smooth and spoon over the cooled loaf."
+        ]}
+      ],
+      "notes": ["Leena's tip: the darker the bananas, the better the bread."]
+    },
+    {
+      "id": "lemon-garlic-marinade",
+      "title": "Lemon Garlic Marinade",
+      "source": "Screenshot of a recipe post (ingredients only)",
+      "ingredients": [
+        {"name": "", "items": [
+          {"text": "3 tbsp olive oil", "qty": "3", "unit": "tbsp", "item": "olive oil"},
+          {"text": "Juice of 1 lemon", "qty": "", "unit": "", "item": "lemon juice"},
+          {"text": "4 cloves garlic, grated", "qty": "4", "unit": "cloves", "item": "garlic, grated"},
+          {"text": "1 tsp smoked papriak", "qty": "1", "unit": "tsp", "item": "smoked papriak",
+           "flag": "\"papriak\" is kept exactly as the source wrote it - it is probably paprika."},
+          {"text": "Salt and pepper to taste", "qty": "", "unit": "", "item": "salt and pepper"}
+        ]}
+      ],
+      "method": [],
+      "how_to_use": "Mix everything together, coat the meat or vegetables, and leave to marinate before cooking. Cook meat until it is cooked through (chicken to 165°F / 74°C)."
+    }
+  ]
+}

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+/* Recipe card engine. One file, no network, no model. The cards live in RECIPES
+   below, every size already worked out by build_card.py. Do not edit per recipe. */
+:root{
+  --ground:#EAF2F8; --surface:#FFFFFF; --ink:#13233A; --soft:#4A5B70; --lines:#C9D6E2;
+  --accent:#1F5FBF; --on-accent:#FFFFFF; --tint:#EEF4FC; --warn:#9A5B00; --warn-bg:#FDF0D9;
+  --shadow:rgba(19,35,58,.14);
+  --font: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Nunito", "Varela Round", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+:root[data-bg="pine"]{ --ground:#E4F0E8; --ink:#14301F; --soft:#47604F; --lines:#C3D8CA; --accent:#1F6B45; --tint:#EDF5F0; }
+:root[data-bg="sunset"]{ --ground:#FCEDE2; --ink:#3A1E10; --soft:#6D4C3B; --lines:#EBCDB8; --accent:#C2410C; --tint:#FDF3EC; }
+:root[data-bg="berry"]{ --ground:#F3E8F6; --ink:#2E1534; --soft:#654A6B; --lines:#DCC6E2; --accent:#8A2B8F; --tint:#F8F0FA; }
+:root[data-bg="sky"]{ --ground:#E3F4FB; --ink:#0F2A36; --soft:#43626F; --lines:#BFDDEA; --accent:#0B7A9C; --tint:#EEF8FC; }
+:root[data-bg="night"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --tint:#1D2F48; --warn:#F2B35E; --warn-bg:#3A2A12; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-bg="auto"]:not([data-theme="light"]){
+    --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+    --accent:#78A9FF; --on-accent:#0E1828; --tint:#1D2F48; --warn:#F2B35E; --warn-bg:#3A2A12; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+  }
+}
+:root[data-bg="auto"][data-theme="dark"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --tint:#1D2F48; --warn:#F2B35E; --warn-bg:#3A2A12; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+:root[data-font="story"]{ --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
+:root[data-font="clear"]{ --font: Verdana, "Atkinson Hyperlegible", Tahoma, "DejaVu Sans", sans-serif; }
+:root[data-font="hand"]{ --font: "Chalkboard SE", "Comic Sans MS", "Comic Neue", "Marker Felt", cursive; }
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--font);font-size:19px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{width:100%;max-width:980px;margin:0 auto;padding:clamp(12px,3vw,28px) clamp(10px,3vw,28px) 40px}
+.top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.top h1{margin:0;font-size:clamp(18px,3vw,22px);color:var(--soft);font-weight:700;overflow-wrap:anywhere;min-width:0}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.tools button,.pop button{padding:8px 13px;border-radius:12px;background:var(--surface);border:2px solid var(--lines);font-weight:700;font-size:15px}
+.dd{position:relative}
+.pop{position:absolute;z-index:5;top:calc(100% + 6px);right:0;display:none;flex-direction:column;gap:6px;padding:10px;min-width:210px;background:var(--surface);border:2px solid var(--lines);border-radius:14px;box-shadow:0 10px 24px var(--shadow)}
+.pop.open{display:flex}
+.pop h4{margin:4px 2px 0;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft)}
+.sw{display:flex;flex-wrap:wrap;gap:6px}
+.sw button{padding:6px 10px;font-size:14px;border:2px solid transparent;background:var(--ground)}
+.sw button.on{border-color:var(--accent)}
+.jump{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.jump a{padding:6px 12px;border-radius:999px;background:var(--surface);border:2px solid var(--lines);color:var(--ink);text-decoration:none;font-size:15px;font-weight:700}
+.card{background:var(--surface);border-radius:20px;box-shadow:0 6px 22px var(--shadow);padding:clamp(16px,4vw,32px);margin:0 0 26px;min-width:0}
+.card h2{margin:0;font-size:clamp(28px,6vw,40px);line-height:1.1;overflow-wrap:anywhere}
+.src{margin:6px 0 0;color:var(--soft);font-size:15px;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
+.chip{padding:4px 11px;border-radius:999px;background:var(--tint);font-size:15px;font-weight:700}
+.chip.scaled{background:var(--accent);color:var(--on-accent)}
+.sizes{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:16px 0 0}
+.sizes span{font-size:14px;color:var(--soft);margin-right:2px;font-weight:700}
+.sizes button{min-width:52px;padding:8px 10px;border-radius:12px;border:2px solid var(--lines);font-weight:800;font-size:16px;line-height:1.1}
+.sizes button small{display:block;font-weight:600;font-size:12px;color:var(--soft)}
+.sizes button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.sizes button.on small{color:var(--on-accent)}
+.body{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(16px,3vw,32px);margin-top:22px}
+.ing{background:var(--tint);border-radius:16px;padding:16px 16px 10px;min-width:0}
+.body h3{margin:0 0 8px;font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.body h4{margin:12px 0 4px;font-size:16px;color:var(--soft)}
+.ing ul,.met ol{list-style:none;margin:0;padding:0}
+.ing li,.met li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;padding:7px 0;border-bottom:1px solid var(--lines);cursor:pointer;overflow-wrap:anywhere;break-inside:avoid}
+.ing li:last-child,.met li:last-child{border-bottom:0}
+.box{width:24px;height:24px;margin-top:2px;border-radius:7px;border:2px solid var(--soft);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--on-accent)}
+.met .box{border-radius:50%;font-size:13px;color:var(--soft);font-weight:800}
+li.tick .box{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+li.tick .tx{color:var(--soft);text-decoration:line-through;text-decoration-color:var(--lines)}
+.was{display:block;font-size:13px;color:var(--soft)}
+.fixed{display:block;font-size:13px;color:var(--warn)}
+.flag{color:var(--warn);font-weight:900}
+.met{min-width:0}
+.note{margin:14px 0 0;padding:10px 12px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-size:15px}
+.howto{margin:0;padding:12px 14px;border-radius:12px;background:var(--tint)}
+.howto b{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--warn);margin-bottom:4px}
+.foot{margin:18px 0 0;padding-top:10px;border-top:1px solid var(--lines);font-size:14px;color:var(--soft)}
+.foot p{margin:4px 0}
+footer{color:var(--soft);font-size:13px;margin-top:10px}
+@media (max-width: 620px){ .body{grid-template-columns:minmax(0,1fr)} body{font-size:18px} }
+@media print{
+  :root{--ground:#fff!important;--surface:#fff!important;--ink:#000!important;--soft:#444!important;--accent:#000!important;--tint:#f2f2f2!important;--lines:#bbb!important;--warn:#000!important;--warn-bg:#f2f2f2!important;--on-accent:#fff!important;color-scheme:light}
+  @page{margin:12mm}
+  body{font-size:11pt;background:#fff}
+  .wrap{padding:0;max-width:none}
+  .top,.jump,.sizes,footer{display:none!important}
+  .card{box-shadow:none;border-radius:0;padding:0;margin:0;break-after:page}
+  .card:last-of-type{break-after:auto}
+  .card h2{font-size:22pt}
+  .body{grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:8mm;margin-top:5mm}
+  .ing{padding:4mm}
+  .ing li,.met li{padding:3px 0;grid-template-columns:20px minmax(0,1fr);gap:5px}
+  .box{width:13px;height:13px;border-width:1.5px;font-size:9px;margin-top:3px}
+  li.tick .tx{text-decoration:none;color:#000}
+  li.tick .box{background:#fff;color:#000;border-color:#444}
+  .chip.scaled{background:#000;color:#fff}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1 id="ftitle"></h1>
+    <div class="tools">
+      <button data-act="print">Print</button>
+      <div class="dd"><button data-pop="look">Look ▾</button>
+        <div class="pop" id="pop-look">
+          <h4>Colour</h4><div class="sw" id="sw-bg"></div>
+          <h4>Letters</h4><div class="sw" id="sw-font"></div>
+        </div></div>
+      <button data-act="untick">Clear ticks</button>
+    </div>
+  </div>
+  <nav class="jump" id="jump"></nav>
+  <main id="cards"></main>
+  <footer>Tap an ingredient or a step to tick it off. Ticks and sizes are kept in this browser.</footer>
+</div>
+<script>
+var RECIPES = /*__RECIPES__*/null;
+(function(){
+"use strict";
+var R = RECIPES, root = document.documentElement;
+var COLOURS = [["auto","Auto"],["snow","Snow"],["sky","Sky"],["pine","Pine"],["sunset","Sunset"],["berry","Berry"],["night","Night"]];
+var FONTS = [["rounded","Rounded"],["clear","Easy to read"],["story","Storybook"],["hand","Handwriting"]];
+var KEY = "recipe-cards:" + R.id;
+var $ = function(id){ return document.getElementById(id); };
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+var S = load() || {};
+S.tick = S.tick || {}; S.size = S.size || {}; S.look = S.look || { bg: R.look.bg, font: R.look.font };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(ch){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]; }); }
+
+$("ftitle").textContent = R.title;
+if (R.cards.length > 1) $("jump").innerHTML = R.cards.map(function(c){ return '<a href="#c-' + esc(c.id) + '">' + esc(c.title) + '</a>'; }).join("");
+
+function sizeOf(c){ var s = S.size[c.id]; return (typeof s === "number" && s >= 0 && s < c.opts.length) ? s : c.start; }
+
+function cardHTML(c){
+  var si = sizeOf(c), o = c.opts[si], scaled = o.f !== 1, h = "";
+  h += '<article class="card" id="c-' + esc(c.id) + '"><h2>' + esc(c.title) + '</h2>';
+  if (c.source) h += '<p class="src">' + esc(c.source) + '</p>';
+  var chips = [];
+  if (c.servesText) chips.push('<span class="chip">' + esc(c.servesText) + '</span>');
+  (c.times || []).forEach(function(t){ chips.push('<span class="chip">' + esc(t.label) + ' · ' + esc(t.text) + '</span>'); });
+  if (scaled) chips.push('<span class="chip scaled">Scaled ' + esc(o.label) + (o.n ? ' · makes ' + esc(o.n) : '') + '</span>');
+  if (R.units === "us") chips.push('<span class="chip scaled">Amounts in US units</span>');
+  if (R.units === "metric") chips.push('<span class="chip scaled">Amounts in metric</span>');
+  if (chips.length) h += '<div class="chips">' + chips.join("") + '</div>';
+  if (c.opts.length > 1){
+    h += '<div class="sizes" role="group" aria-label="Make more or less"><span>Make</span>';
+    c.opts.forEach(function(x, i){ h += '<button data-size="' + i + '" data-card="' + esc(c.id) + '"' + (i === si ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + '>' + esc(x.label) + (x.n ? '<small>' + esc(x.n) + '</small>' : '') + '</button>'; });
+    h += '</div>';
+  }
+  h += '<div class="body"><section class="ing"><h3>Ingredients</h3>';
+  var flags = [];
+  c.groups.forEach(function(g, gi){
+    if (g.name) h += '<h4>' + esc(g.name) + '</h4>';
+    h += '<ul>';
+    g.items.forEach(function(it, ii){
+      var v = it.v[si], k = c.id + ":i:" + gi + ":" + ii, mark = "";
+      if (it.flag){ flags.push(it.flag); mark = ' <span class="flag">*' + flags.length + '</span>'; }
+      h += '<li data-tick="' + k + '"' + (S.tick[k] ? ' class="tick"' : '') + '><span class="box">' + (S.tick[k] ? "✓" : "") + '</span><span class="tx">' + esc(v.t) + mark +
+           (v.was ? '<span class="was">source: ' + esc(v.was) + '</span>' : '') +
+           (v.fixed ? '<span class="fixed">not scaled - adjust to taste</span>' : '') + '</span></li>';
+    });
+    h += '</ul>';
+  });
+  h += '</section><section class="met"><h3>Method</h3>';
+  var nSteps = 0;
+  c.method.forEach(function(m, mi){
+    if (m.name) h += '<h4>' + esc(m.name) + '</h4>';
+    h += '<ol>';
+    m.steps.forEach(function(s, i){
+      var k = c.id + ":s:" + mi + ":" + i; nSteps++;
+      h += '<li data-tick="' + k + '"' + (S.tick[k] ? ' class="tick"' : '') + '><span class="box">' + (S.tick[k] ? "✓" : (i + 1)) + '</span><span class="tx">' + esc(s) + '</span></li>';
+    });
+    h += '</ol>';
+  });
+  if (!nSteps && c.howTo) h += '<p class="howto"><b>General guidance - the source gave no method</b>' + esc(c.howTo) + '</p>';
+  else if (!nSteps) h += '<p class="howto"><b>No method</b>The source gave ingredients only.</p>';
+  if (scaled && c.stepsHaveNumbers) h += '<p class="note">Amounts written inside the steps are for the original size.</p>';
+  h += '</section></div>';
+  if (flags.length || (c.notes && c.notes.length)){
+    h += '<div class="foot">';
+    flags.forEach(function(f, i){ h += '<p><span class="flag">*' + (i + 1) + '</span> ' + esc(f) + '</p>'; });
+    (c.notes || []).forEach(function(n){ h += '<p>' + esc(n) + '</p>'; });
+    h += '</div>';
+  }
+  return h + '</article>';
+}
+function drawAll(){ $("cards").innerHTML = R.cards.map(cardHTML).join(""); }
+function drawCard(id){
+  var c = R.cards.filter(function(x){ return x.id === id; })[0], el = $("c-" + id);
+  var tmp = document.createElement("div"); tmp.innerHTML = cardHTML(c); el.parentNode.replaceChild(tmp.firstChild, el);
+}
+function swatches(){
+  $("sw-bg").innerHTML = COLOURS.map(function(o){ return '<button data-bg="' + o[0] + '"' + (S.look.bg === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+  $("sw-font").innerHTML = FONTS.map(function(o){ return '<button data-font="' + o[0] + '"' + (S.look.font === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+}
+function applyLook(){ root.setAttribute("data-bg", S.look.bg); root.setAttribute("data-font", S.look.font); swatches(); }
+function closePops(except){ var ps = document.querySelectorAll(".pop"); for (var i = 0; i < ps.length; i++) if (ps[i] !== except) ps[i].classList.remove("open"); }
+
+document.addEventListener("click", function(ev){
+  var el = ev.target;
+  while (el && el !== document && !(el.getAttribute && (el.hasAttribute("data-tick") || el.hasAttribute("data-size") || el.hasAttribute("data-act") || el.hasAttribute("data-pop") || el.hasAttribute("data-bg") || el.hasAttribute("data-font")))) el = el.parentNode;
+  if (el === document.documentElement) el = document; /* <html> carries data-font/data-bg for the look: a tap on blank space is not a menu choice */
+  if (!el || el === document){ closePops(); return; }
+  var a = function(n){ return el.getAttribute(n); };
+  if (el.hasAttribute("data-pop")){ var p = $("pop-" + a("data-pop")); closePops(p); p.classList.toggle("open"); return; }
+  closePops();
+  if (el.hasAttribute("data-tick")){
+    var k = a("data-tick"); if (S.tick[k]) delete S.tick[k]; else S.tick[k] = 1;
+    var on = !!S.tick[k]; el.classList.toggle("tick", on);
+    var box = el.querySelector(".box"), isStep = k.indexOf(":s:") > 0;
+    box.textContent = on ? "✓" : (isStep ? (+k.split(":").pop() + 1) : "");
+    save(); return;
+  }
+  if (el.hasAttribute("data-size")){ S.size[a("data-card")] = +a("data-size"); save(); drawCard(a("data-card")); return; }
+  if (el.hasAttribute("data-bg")){ S.look.bg = a("data-bg"); save(); applyLook(); return; }
+  if (el.hasAttribute("data-font")){ S.look.font = a("data-font"); save(); applyLook(); return; }
+  if (a("data-act") === "print") window.print();
+  else if (a("data-act") === "untick"){ S.tick = {}; save(); drawAll(); }
+});
+applyLook(); drawAll();
+window.__recipes = { state: function(){ return S; } };
+})();
+</script>
+</body>
+</html>

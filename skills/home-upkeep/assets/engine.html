@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+/* Home upkeep engine. One file, no network, no model. The plan lives in HOME
+   below; build_home.py works out every date. Do not edit per home. */
+:root{
+  --ground:#EAF2F8; --surface:#FFFFFF; --ink:#13233A; --soft:#4A5B70; --lines:#C9D6E2;
+  --accent:#1F5FBF; --on-accent:#FFFFFF; --good:#1E7B4A; --good-bg:#DDF3E6; --bad:#9A3B00; --bad-bg:#FDEBDD;
+  --hl:#D6E6FB; --shadow:rgba(19,35,58,.18);
+  --font: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Nunito", "Varela Round", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:16px; color-scheme: light;
+}
+:root[data-bg="pine"]{ --ground:#E4F0E8; --ink:#14301F; --soft:#47604F; --lines:#C3D8CA; --accent:#1F6B45; --hl:#CFE6D8; }
+:root[data-bg="sunset"]{ --ground:#FCEDE2; --ink:#3A1E10; --soft:#6D4C3B; --lines:#EBCDB8; --accent:#C2410C; --hl:#F8D9C4; }
+:root[data-bg="berry"]{ --ground:#F3E8F6; --ink:#2E1534; --soft:#654A6B; --lines:#DCC6E2; --accent:#8A2B8F; --hl:#EBD3F0; }
+:root[data-bg="sky"]{ --ground:#E3F4FB; --ink:#0F2A36; --soft:#43626F; --lines:#BFDDEA; --accent:#0B7A9C; --hl:#C9E8F4; }
+:root[data-bg="night"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2A06E; --bad-bg:#3A2212;
+  --hl:#2A4A78; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-bg="auto"]:not([data-theme="light"]){
+    --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+    --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2A06E; --bad-bg:#3A2212;
+    --hl:#2A4A78; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+  }
+}
+:root[data-bg="auto"][data-theme="dark"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2A06E; --bad-bg:#3A2212;
+  --hl:#2A4A78; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+/* local fonts only, so the file works offline and inside any sandbox */
+:root[data-font="story"]{ --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
+:root[data-font="clear"]{ --font: Verdana, "Atkinson Hyperlegible", Tahoma, "DejaVu Sans", sans-serif; }
+:root[data-font="hand"]{ --font: "Chalkboard SE", "Comic Sans MS", "Comic Neue", "Marker Felt", cursive; }
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:900px;margin:0 auto;padding:clamp(14px,3vw,28px) clamp(12px,3vw,28px) 40px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+h1{margin:0;font-size:clamp(26px,5vw,38px);line-height:1.1;overflow-wrap:anywhere}
+.sub{margin:6px 0 0;color:var(--soft)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px;margin:16px 0}
+.fact{background:var(--surface);border:2px solid var(--lines);border-radius:14px;padding:10px 12px;min-width:0}
+.fact b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.fact span{font-weight:800;font-size:18px;overflow-wrap:anywhere}
+.bar{position:sticky;top:0;z-index:4;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;background:var(--ground)}
+.btn{padding:9px 14px;border-radius:12px;border:2px solid var(--lines);background:var(--surface);font-weight:800;font-size:15px}
+.btn.main{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.progress{margin-left:auto;font-weight:800;color:var(--soft)}
+.tool{white-space:nowrap;padding:7px 12px;border-radius:10px;border:2px solid var(--lines);background:var(--surface);font-weight:700;font-size:14px}
+.dd{position:relative;display:inline-block}
+.pop{position:absolute;right:0;top:calc(100% + 6px);z-index:6;display:none;flex-direction:column;gap:6px;padding:10px;min-width:220px;background:var(--surface);border:2px solid var(--lines);border-radius:14px;box-shadow:0 10px 24px var(--shadow)}
+.pop.open{display:flex}
+.pop h4{margin:2px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft)}
+.sw{display:flex;flex-wrap:wrap;gap:6px}
+.sw button{padding:5px 10px;border-radius:10px;background:var(--ground);border:2px solid transparent;font-size:14px}
+.sw button.on{border-color:var(--accent)}
+.qhead{display:none}
+.month{margin-top:22px}
+.mhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;margin:0 0 8px;border-bottom:2px solid var(--lines);padding-bottom:4px}
+.mhead h2{margin:0;font-size:22px}
+.mstat{color:var(--soft);font-weight:700;font-size:14px}
+.empty{color:var(--soft);font-style:italic;padding:4px 0 8px}
+.job{display:grid;grid-template-columns:44px 92px minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px 12px;border-radius:12px;background:var(--surface);border:2px solid var(--lines);margin-bottom:6px}
+.tick{width:34px;height:34px;border-radius:10px;border:2px solid var(--lines);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:transparent;background:var(--ground)}
+.job.done{opacity:.6}
+.job.done .tick{background:var(--good);border-color:var(--good);color:#fff}
+.job.done .what{text-decoration:line-through}
+.when{font-weight:800;padding-top:5px;white-space:nowrap}
+.what{font-weight:800;overflow-wrap:anywhere;padding-top:4px}
+.why{font-size:14px;color:var(--soft);margin-top:2px}
+.meta{font-size:13px;color:var(--soft);margin-top:3px}
+.tag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:800;vertical-align:1px;background:var(--hl);color:var(--ink)}
+.tag.safe{background:var(--bad-bg);color:var(--bad)}
+.tag.landlord{background:var(--good-bg);color:var(--good)}
+.mins{font-weight:700;color:var(--soft);white-space:nowrap;padding-top:5px;text-align:right}
+.card{background:var(--surface);border:2px solid var(--lines);border-radius:var(--r);padding:14px 16px;margin:22px 0 12px}
+.card h3{margin:0 0 6px;font-size:18px}
+.card ul{margin:0;padding-left:20px}
+footer{margin-top:24px;color:var(--soft);font-size:13px}
+footer ul{margin:6px 0;padding-left:18px}
+@media (max-width:560px){
+  .job{grid-template-columns:40px minmax(0,1fr) auto;gap:4px 10px}
+  .job .tick{grid-row:span 2}
+  .when{padding-top:4px}
+  .job .body{grid-column:2 / span 2}
+  .mins{grid-column:3;grid-row:1}
+  .progress{margin-left:0;width:100%}
+}
+.print-only{display:none}
+@media print{
+  :root{--ground:#fff!important;--surface:#fff!important;--ink:#000!important;--soft:#222!important;--accent:#000!important;--lines:#999!important;--hl:#fff!important;--good-bg:#fff!important;--good:#000!important;--bad-bg:#fff!important;--bad:#000!important;color-scheme:light}
+  @page{margin:9mm 10mm}
+  body{font-size:8pt;line-height:1.08;background:#fff}
+  .wrap{padding:0;max-width:none}
+  .bar,.dd,.facts,.top,footer{display:none!important}
+  .quarter{break-before:page}
+  .quarter:first-of-type{break-before:auto}
+  .qhead{display:block;border-bottom:1.5px solid #000;margin:0 0 1mm;padding-bottom:.6mm}
+  .qhead b{font-size:12pt} .qhead span{float:right;font-size:8.5pt;padding-top:3pt}
+  .month{margin-top:1.2mm;break-inside:auto}
+  .mhead{margin:0 0 .3mm;padding-bottom:.3mm;border-bottom-width:1px;break-after:avoid}
+  .mhead h2{font-size:10pt} .mstat{font-size:7.5pt}
+  .empty{padding:0 0 1mm;font-size:8pt}
+  .job{grid-template-columns:3.4mm 18mm minmax(0,1fr) 11mm;gap:0 1.6mm;padding:.3mm 0;border:0;border-bottom:.5px solid #bbb;border-radius:0;margin:0;break-inside:avoid;opacity:1!important}
+  .job .tick{grid-row:auto;width:3mm;height:3mm;border-radius:.5mm;border:1px solid #000;background:#fff!important;color:transparent!important;margin-top:.3mm}
+  .job.done .what{text-decoration:none}
+  .when,.what,.mins{padding-top:0}
+  .job .body{grid-column:auto}
+  .mins{grid-column:auto;grid-row:auto;font-weight:400}
+  .why{font-size:6.6pt;margin-top:0;line-height:1.05}
+  .meta{display:none}
+  .tag{border:.5px solid #000;padding:0 2.5pt;font-size:5.8pt;margin-left:3pt;line-height:1.05;vertical-align:.5pt}
+  .quarter.dense .why{display:none}
+  .card.later{margin:2mm 0 0;padding:1mm 2mm;border-width:1px;border-radius:1.5mm;break-inside:avoid;font-size:7.5pt}
+  .card.later h3{font-size:8.5pt;margin:0 0 .5mm}
+  .print-only{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1 id="title"></h1><p class="sub" id="sub"></p></div>
+    <div class="dd"><button class="tool" data-pop="look">Look ▾</button>
+      <div class="pop" id="pop-look"><h4>Colour</h4><div class="sw" id="sw-bg"></div><h4>Letters</h4><div class="sw" id="sw-font"></div></div></div>
+  </div>
+  <div class="facts" id="facts"></div>
+  <div class="bar">
+    <button class="btn main" data-act="ics">Download calendar (.ics)</button>
+    <button class="btn" data-act="print">Print</button>
+    <span class="progress" id="progress"></span>
+  </div>
+  <div id="months"></div>
+  <div id="later"></div>
+  <footer><b>How the dates were worked out</b><ul id="rules"></ul><span id="built"></span> Ticks are kept in this browser on this device.</footer>
+</div>
+
+<script>
+var HOME = /*__HOME__*/null;
+(function(){
+"use strict";
+var H = HOME, root = document.documentElement, $ = function(id){ return document.getElementById(id); };
+var COLOURS = [["auto","Auto"],["snow","Snow"],["sky","Sky"],["pine","Pine"],["sunset","Sunset"],["berry","Berry"],["night","Night"]];
+var FONTS = [["rounded","Rounded"],["clear","Easy to read"],["story","Storybook"],["hand","Handwriting"]];
+var KEY = "home:" + H.id;
+var DENSE = 36;   /* a printed quarter with more rows than this leaves out the why lines, so it still fits one sheet */
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+var S = load() || {}; S.ticks = S.ticks || {}; S.look = S.look || { bg: H.look.bg, font: H.look.font };
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+/* ---------- the calendar file: the same bytes build_home.py writes with --ics ---------- */
+function icsEsc(s){ return String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r\n|\r|\n/g, "\\n"); }
+function u8(cp){ return cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4; }
+function fold(line){
+  var out = [], cur = "", n = 0;
+  for (var ch of line){ var b = u8(ch.codePointAt(0)); if (n + b > 75){ out.push(cur); cur = " "; n = 1; } cur += ch; n += b; }
+  out.push(cur); return out.join("\r\n");
+}
+function icsText(){
+  var C = H.ics, L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:" + C.prodid, "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:" + icsEsc(C.calname)];
+  C.events.forEach(function(e){
+    L.push("BEGIN:VEVENT", "UID:" + e.uid, "DTSTAMP:" + C.dtstamp, "DTSTART;VALUE=DATE:" + e.start, "DTEND;VALUE=DATE:" + e.end,
+      "SUMMARY:" + icsEsc(e.summary), "DESCRIPTION:" + icsEsc(e.description), "TRANSP:TRANSPARENT", "END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  return L.map(fold).join("\r\n") + "\r\n";
+}
+function downloadIcs(){
+  var blob = new Blob([icsText()], { type: "text/calendar;charset=utf-8" });
+  var url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = H.ics.name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+}
+
+/* ---------- header ---------- */
+var F = H.facts;
+$("title").textContent = H.title; $("sub").textContent = H.subtitle;
+$("facts").innerHTML =
+  '<div class="fact"><b>Jobs</b><span>' + F.jobs + '</span></div>' +
+  '<div class="fact"><b>Dates this year</b><span>' + F.dates + '</span></div>' +
+  '<div class="fact"><b>Time this year</b><span>about ' + esc(F.time) + '</span></div>' +
+  '<div class="fact"><b>Busiest week</b><span>' + F.busiest + ' job' + (F.busiest === 1 ? '' : 's') + '</span></div>';
+$("rules").innerHTML = H.rules.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join("");
+$("built").textContent = "Worked out " + H.builtOn + ".";
+if (H.later.length) $("later").innerHTML = '<div class="card later"><h3>Left out of these twelve months</h3><ul>' +
+  H.later.map(function(l){ return '<li><b>' + esc(l.title) + '</b> · ' + esc(l.note) + '</li>'; }).join("") + '</ul></div>';
+
+/* ---------- months, three to a printed sheet ---------- */
+function draw(){
+  var h = "", done = 0, all = 0;
+  H.quarters.forEach(function(q){
+    var n = H.months.filter(function(m){ return m.quarter === q.n - 1; }).reduce(function(s, m){ return s + m.items.length; }, 0);
+    h += '<section class="quarter' + (n > DENSE ? ' dense' : '') + '"><div class="qhead"><b>' + esc(H.title) + ' · Quarter ' + q.n + '</b><span>' + esc(q.label) + '</span></div>';
+    H.months.filter(function(m){ return m.quarter === q.n - 1; }).forEach(function(m){
+      var d = m.items.filter(function(it){ return S.ticks[it.uid]; }).length;
+      done += d; all += m.items.length;
+      h += '<div class="month"><div class="mhead"><h2>' + esc(m.label) + '</h2><span class="mstat">' +
+        (m.count ? d + ' of ' + m.count + ' done · about ' + esc(m.time) : 'Nothing due') + '</span></div>';
+      if (!m.count) h += '<div class="empty">A quiet month.</div>';
+      m.items.forEach(function(it){
+        var on = !!S.ticks[it.uid];
+        h += '<div class="job' + (on ? ' done' : '') + '" data-job="' + esc(it.uid) + '">' +
+          '<button class="tick" data-tick="' + esc(it.uid) + '" aria-pressed="' + on + '" aria-label="Done: ' + esc(it.title) + '">✓</button>' +
+          '<div class="when">' + esc(it.day) + '</div>' +
+          '<div class="body"><div class="what">' + esc(it.title) +
+            '<span class="tag' + (it.who === "landlord" ? ' landlord' : '') + '">' + esc(it.whoLabel) + '</span>' +
+            (it.safety ? '<span class="tag safe">Safety</span>' : '') + '</div>' +
+          '<div class="why">' + esc(it.why) + '</div>' +
+          (it.note || it.moved ? '<div class="meta">' + esc([it.note, it.moved ? "Moved " + it.moved : ""].filter(Boolean).join(" · ")) + '</div>' : '') +
+          '</div><div class="mins">' + it.minutes + ' min</div></div>';
+      });
+      h += '</div>';
+    });
+    h += '</section>';
+  });
+  $("months").innerHTML = h;
+  $("progress").textContent = done + " of " + all + " done";
+}
+
+/* ---------- look ---------- */
+function swatches(){
+  $("sw-bg").innerHTML = COLOURS.map(function(o){ return '<button data-bg="' + o[0] + '"' + (S.look.bg === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+  $("sw-font").innerHTML = FONTS.map(function(o){ return '<button data-font="' + o[0] + '"' + (S.look.font === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+}
+function applyLook(){ root.setAttribute("data-bg", S.look.bg); root.setAttribute("data-font", S.look.font); swatches(); }
+
+function isControl(el){ return el.hasAttribute("data-tick") || el.hasAttribute("data-act") || el.hasAttribute("data-pop") || el.hasAttribute("data-bg") || el.hasAttribute("data-font"); }
+document.addEventListener("click", function(ev){
+  var el = ev.target;
+  /* stop at <html>: it carries data-font/data-bg for the look, so a tap on blank space must not read as a menu choice */
+  while (el && el !== root && el.nodeType === 1 && !isControl(el)) el = el.parentNode;
+  var pop = $("pop-look");
+  if (!el || el === root || el.nodeType !== 1){ pop.classList.remove("open"); return; }
+  var a = function(n){ return el.getAttribute(n); };
+  if (el.hasAttribute("data-pop")){ pop.classList.toggle("open"); return; }
+  if (el.hasAttribute("data-bg")){ S.look.bg = a("data-bg"); save(); applyLook(); return; }
+  if (el.hasAttribute("data-font")){ S.look.font = a("data-font"); save(); applyLook(); return; }
+  pop.classList.remove("open");
+  if (el.hasAttribute("data-tick")){ var id = a("data-tick"); if (S.ticks[id]) delete S.ticks[id]; else S.ticks[id] = 1; save(); draw(); return; }
+  if (a("data-act") === "ics"){ downloadIcs(); return; }
+  if (a("data-act") === "print"){ window.print(); }
+});
+
+applyLook(); draw();
+window.__home = { state: function(){ return S; }, ics: icsText };
+})();
+</script>
+</body>
+</html>

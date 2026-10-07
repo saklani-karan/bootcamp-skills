@@ -1,0 +1,20 @@
+{
+  "builtOn": "6 October 2026",
+  "id": "rivera-household",
+  "title": "The Rivera money plan",
+  "subtitle": "Clearing the cards and the car, and saving for a rainy day and Lisbon",
+  "start": "2026-11",
+  "monthly_amount": 2400,
+  "look": {"font": "rounded", "bg": "auto"},
+  "debts": [
+    {"name": "Visa card", "balance": 6800, "apr": 24.99, "minimum": 204},
+    {"name": "Store card", "balance": 1450, "apr": 19.99, "minimum": 45},
+    {"name": "Car loan", "balance": 14200, "apr": 7.4, "minimum": 389},
+    {"name": "Student loan", "balance": 21500, "apr": 5.5, "minimum": 245}
+  ],
+  "extra": 450,
+  "goals": [
+    {"name": "Emergency fund", "target": 10000, "saved": 2500, "by": "2028-10", "return": 3.5},
+    {"name": "Lisbon trip", "target": 6000, "saved": 400, "by": "2028-06", "return": 3.0}
+  ]
+}

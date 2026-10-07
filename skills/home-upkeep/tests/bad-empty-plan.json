@@ -1,0 +1,31 @@
+{
+ "id": "test-flat",
+ "title": "Test flat upkeep",
+ "builtOn": "7 October 2026",
+ "example": true,
+ "region": "Melbourne, Australia",
+ "hemisphere": "south",
+ "words": "uk",
+ "home": {
+  "type": "apartment",
+  "tenure": "rent"
+ },
+ "features": [
+  "smoke_alarms",
+  "ac",
+  "water_heater",
+  "dishwasher",
+  "washing_machine",
+  "range_hood",
+  "deck",
+  "yard",
+  "car"
+ ],
+ "start": "2026-10",
+ "jobs": [],
+ "custom": [],
+ "look": {
+  "font": "clear",
+  "bg": "pine"
+ }
+}

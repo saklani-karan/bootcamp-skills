@@ -1,0 +1,23 @@
+{
+ "builtOn": "7 October 2026",
+ "id": "maya-leo-ivy-autumn",
+ "title": "Maya, Leo & Ivy's chore chart",
+ "start": "2026-10-12",
+ "weeks": 4,
+ "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+ "look": {"font": "rounded", "bg": "sunset"},
+ "children": [
+  {"name": "Maya", "age": 12},
+  {"name": "Leo", "age": 9},
+  {"name": "Ivy", "age": 5}
+ ],
+ "chores": [
+  "set-table", "clear-table", "toys-away", "water-plants", "match-socks",
+  "unload-dishwasher", "fold-laundry", "sweep-kitchen", "trash-out", "vacuum", "bathroom-sink",
+  {"id": "feed-pet", "same_child_ok": true},
+  {"title": "Feed the fish", "min_age": 4, "effort": 1, "how_often": "daily"}
+ ],
+ "exclusions": [
+  {"child": "Leo", "chore": "feed-pet", "why": "allergic to the cat"}
+ ]
+}

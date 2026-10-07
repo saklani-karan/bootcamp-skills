@@ -1,0 +1,35 @@
+{
+ "id": "Test Sea!",
+ "title": "Test Sea",
+ "age": 9,
+ "look": {
+  "font": "rounded",
+  "bg": "auto"
+ },
+ "words": [
+  {
+   "answer": "Octopus",
+   "clue": "Eight arms and three hearts"
+  },
+  {
+   "answer": "Dolphin",
+   "clue": "Clever sea mammal that clicks"
+  },
+  {
+   "answer": "Shark",
+   "clue": "Fish that keeps growing new teeth"
+  },
+  {
+   "answer": "Crab",
+   "clue": "Scrabbles sideways along the sand"
+  },
+  {
+   "answer": "Ice cream",
+   "clue": "A cold treat at the beach"
+  },
+  {
+   "answer": "Seahorse",
+   "clue": "The dad carries the babies"
+  }
+ ]
+}

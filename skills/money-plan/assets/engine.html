@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+/* Money plan engine. One file, no network, no model. Every number in PLAN was
+   computed by build_plan.py. Do not edit per plan. */
+:root{
+  --ground:#EAF2F8; --surface:#FFFFFF; --ink:#13233A; --soft:#4A5B70; --lines:#C9D6E2;
+  --accent:#1F5FBF; --on-accent:#FFFFFF; --good:#1E7B4A; --good-bg:#DDF3E6; --bad:#9A5B00; --bad-bg:#FDF0D9;
+  --s1:#2a78d6; --s2:#eb6834; --grid:#DCE4EC; --shadow:rgba(19,35,58,.14);
+  --font: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Nunito", "Varela Round", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:16px; color-scheme: light;
+}
+:root[data-bg="pine"]{ --ground:#E4F0E8; --ink:#14301F; --soft:#47604F; --lines:#C3D8CA; --accent:#1F6B45; }
+:root[data-bg="sunset"]{ --ground:#FCEDE2; --ink:#3A1E10; --soft:#6D4C3B; --lines:#EBCDB8; --accent:#C2410C; }
+:root[data-bg="berry"]{ --ground:#F3E8F6; --ink:#2E1534; --soft:#654A6B; --lines:#DCC6E2; --accent:#8A2B8F; }
+:root[data-bg="sky"]{ --ground:#E3F4FB; --ink:#0F2A36; --soft:#43626F; --lines:#BFDDEA; --accent:#0B7A9C; }
+:root[data-bg="night"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2B35E; --bad-bg:#3A2A12;
+  --s1:#3987e5; --s2:#d95926; --grid:#253650; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-bg="auto"]:not([data-theme="light"]){
+    --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+    --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2B35E; --bad-bg:#3A2A12;
+    --s1:#3987e5; --s2:#d95926; --grid:#253650; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+  }
+}
+:root[data-bg="auto"][data-theme="dark"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2B35E; --bad-bg:#3A2A12;
+  --s1:#3987e5; --s2:#d95926; --grid:#253650; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+:root[data-font="story"]{ --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
+:root[data-font="clear"]{ --font: Verdana, "Atkinson Hyperlegible", Tahoma, "DejaVu Sans", sans-serif; }
+:root[data-font="hand"]{ --font: "Chalkboard SE", "Comic Sans MS", "Comic Neue", "Marker Felt", cursive; }
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.45}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding:clamp(14px,3vw,30px) clamp(12px,3vw,28px) 48px}
+header h1{margin:0;font-size:clamp(26px,5vw,38px);line-height:1.1;overflow-wrap:anywhere}
+header p{margin:6px 0 0;color:var(--soft)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.bar button,.pop button{padding:8px 14px;border-radius:12px;background:var(--surface);border:2px solid var(--lines);font-weight:700;font-size:15px}
+.dd{position:relative}
+.pop{position:absolute;z-index:5;top:calc(100% + 6px);left:0;display:none;flex-direction:column;gap:6px;padding:10px;min-width:220px;background:var(--surface);border:2px solid var(--lines);border-radius:14px;box-shadow:0 10px 24px var(--shadow)}
+.pop.open{display:flex}
+.pop h4{margin:4px 2px 0;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft)}
+.sw{display:flex;flex-wrap:wrap;gap:6px}
+.sw button{padding:6px 10px;font-size:14px;border:2px solid transparent;background:var(--ground)}
+.sw button.on{border-color:var(--accent)}
+section{margin-top:26px}
+h2{margin:0 0 10px;font-size:21px}
+.card{background:var(--surface);border:1px solid var(--lines);border-radius:var(--r);padding:18px 20px}
+.answer{font-size:clamp(18px,2.6vw,21px);line-height:1.45}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px;margin-top:14px}
+.tile{background:var(--surface);border:1px solid var(--lines);border-radius:14px;padding:14px 16px}
+.tile small{display:block;color:var(--soft);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.tile strong{display:block;font-size:clamp(24px,4vw,30px);line-height:1.15;margin-top:4px}
+.tile span{display:block;color:var(--soft);font-size:14px;margin-top:2px}
+.tabs{display:inline-flex;gap:4px;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--lines);flex-wrap:wrap}
+.tabs button{padding:8px 14px;border-radius:10px;font-weight:700;font-size:15px}
+.tabs button.on{background:var(--accent);color:var(--on-accent)}
+.why{color:var(--soft);margin:8px 0 12px;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;color:var(--soft);margin:2px 0 6px}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{fill:var(--soft);font-size:12px;font-family:var(--font)}
+.chart .lbl{fill:var(--ink);font-weight:700}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--lines);border-radius:10px;padding:8px 10px;font-size:13px;box-shadow:0 6px 16px var(--shadow);display:none;white-space:nowrap;z-index:2}
+.tip b{display:block;margin-bottom:2px}
+.tip i{display:inline-block;width:10px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--lines);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--soft)}
+td.n,th.n{text-align:right;white-space:nowrap}
+@media (max-width:560px){ .sm-hide{display:none} th,td{padding:8px 5px} }
+.scroll{overflow-x:auto}
+.goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.goal strong{font-size:26px;display:block}
+.goal small{color:var(--soft)}
+.meter{height:10px;border-radius:6px;background:var(--ground);margin:10px 0 6px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:6px}
+.fit{display:grid;gap:6px}
+.fit .row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--lines)}
+.fit .row.total{font-weight:800;border-bottom:0}
+.status{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px 14px;border-radius:12px;font-weight:700}
+.status.ok{background:var(--good-bg);color:var(--good)}
+.status.short{background:var(--bad-bg);color:var(--bad)}
+.status svg{flex:none;margin-top:2px}
+details{margin-top:12px}
+summary{cursor:pointer;color:var(--accent);font-weight:700}
+.small{color:var(--soft);font-size:14px}
+ul.assume{margin:6px 0 0;padding-left:20px;color:var(--soft);font-size:15px}
+footer{margin-top:30px;color:var(--soft);font-size:13px}
+@media print{
+  :root{--ground:#fff!important;--surface:#fff!important;--ink:#000!important;--soft:#333!important;--lines:#bbb!important;--grid:#ddd!important;--accent:#000!important;color-scheme:light}
+  @page{margin:14mm}
+  body{font-size:10.5pt}
+  .wrap{padding:0;max-width:none}
+  .bar,.tabs,.tip,details summary{display:none!important}
+  details{display:block} details>*{display:block}
+  section{margin-top:12pt}
+  .card,.tile{border-color:#bbb;break-inside:avoid}
+  .tiles{grid-template-columns:repeat(4,1fr)}
+  .screen-only{display:none!important}
+  h2{break-after:avoid}
+  .chart svg{max-height:58mm;break-inside:avoid}
+  .card.chartcard{break-inside:auto}
+  .card{padding:12px 16px}
+  .answer{font-size:12pt}
+  .tile strong{font-size:18pt}
+  .status{border:1px solid #888;background:#fff!important;color:#000!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="title"></h1>
+    <p id="sub"></p>
+    <div class="bar">
+      <button data-act="print">Print</button>
+      <div class="dd"><button data-pop="look">Look ▾</button>
+        <div class="pop" id="pop-look"><h4>Colour</h4><div class="sw" id="sw-bg"></div><h4>Letters</h4><div class="sw" id="sw-font"></div></div></div>
+    </div>
+  </header>
+
+  <section id="s-answer"></section>
+  <section id="s-debts"></section>
+  <section id="s-goals"></section>
+  <section id="s-fit"></section>
+  <section id="s-assume"></section>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+var PLAN = /*__PLAN__*/null;
+(function(){
+"use strict";
+var P = PLAN, root = document.documentElement, $ = function(id){ return document.getElementById(id); };
+var KEY = "money-plan:" + P.id;
+var COLOURS = [["auto","Auto"],["snow","Snow"],["sky","Sky"],["pine","Pine"],["sunset","Sunset"],["berry","Berry"],["night","Night"]];
+var FONTS = [["rounded","Rounded"],["clear","Easy to read"],["story","Storybook"],["hand","Handwriting"]];
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+var S = load() || {};
+S.look = S.look || { bg: P.look.bg, font: P.look.font };
+var ST = P.strategies, HAS_DEBT = P.debts.length > 0;
+S.view = (S.view && ST[S.view]) ? S.view : (HAS_DEBT ? ST.best : null);
+
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function money(v, cents){ var n = Math.abs(v); var s = n.toLocaleString("en-US", { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 }); return (v < 0 ? "-" : "") + P.sym + s; }
+var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function mlabel(i){ var x = P.startIndex + i; return MON[x % 12] + " " + Math.floor(x / 12); }
+function plural(n, w){ return n + " " + w + (n === 1 ? "" : "s"); }
+function span(m){ var y = Math.floor(m / 12), r = m % 12; return (y ? plural(y, "year") : "") + (y && r ? " and " : "") + (r || !y ? plural(r, "month") : ""); }
+
+/* ---------- look ---------- */
+function swatches(){
+  $("sw-bg").innerHTML = COLOURS.map(function(o){ return '<button data-bg="' + o[0] + '"' + (S.look.bg === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+  $("sw-font").innerHTML = FONTS.map(function(o){ return '<button data-font="' + o[0] + '"' + (S.look.font === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+}
+function applyLook(){ root.setAttribute("data-bg", S.look.bg); root.setAttribute("data-font", S.look.font); swatches(); }
+
+/* ---------- the answer ---------- */
+function answer(){
+  var h = '<div class="card answer">';
+  if (HAS_DEBT){
+    var a = ST.avalanche, s = ST.snowball, b = ST[ST.best];
+    h += 'Putting <b>' + money(P.budget.minimums + P.extra) + '</b> a month toward your debts, you are <b>debt-free by ' + esc(b.free) + '</b>, ' + span(b.months) + ' from now. ';
+    if (ST.saving >= 1){
+      var other = ST.best === "avalanche" ? s : a;
+      h += 'Paying off the <b>' + (ST.best === "avalanche" ? "highest rate" : "smallest balance") + ' first</b> costs <b>' + money(ST.saving) + ' less in interest</b>' +
+           (other.months !== b.months ? ' and finishes ' + plural(Math.abs(other.months - b.months), "month") + (other.months > b.months ? ' sooner' : ' later') : '') + '. ';
+      if (s.first.month < a.first.month) h += 'Paying the smallest balance first clears your first debt sooner (' + esc(s.first.name) + ', ' + esc(s.first.label) + ' instead of ' + esc(a.first.label) + ') - some people find that early win keeps them going.';
+    } else {
+      h += 'Both ways of ordering your debts cost the same here, so pick whichever keeps you going.';
+    }
+  }
+  if (P.goals.length){
+    h += (HAS_DEBT ? '<br><br>' : '') + 'Your ' + plural(P.goals.length, "goal") + ' need' + (P.goals.length === 1 ? 's' : '') + ' <b>' + money(P.budget.goals) + ' a month</b> between ' + (P.goals.length === 1 ? 'it' : 'them') + '. ';
+  }
+  h += (P.budget.short ? 'Altogether that is <b>' + money(P.budget.short) + ' a month more</b> than the ' + money(P.budget.monthly) + ' you said you can put in - see <a href="#s-fit">Does it fit?</a>' :
+        'Altogether that is <b>' + money(P.budget.need) + '</b> of the <b>' + money(P.budget.monthly) + '</b> a month you said you can put in.') + '</div>';
+  if (HAS_DEBT){
+    var b2 = ST[ST.best];
+    h += '<div class="tiles">' +
+      tile("Debt-free by", b2.free, span(b2.months)) +
+      tile("Interest you will pay", money(b2.interest), b2.name.toLowerCase()) +
+      tile("First debt gone", ST.snowball.first.month <= ST.avalanche.first.month ? ST.snowball.first.label : ST.avalanche.first.label,
+           ST.snowball.first.month <= ST.avalanche.first.month ? ST.snowball.first.name + ", smallest balance first" : ST.avalanche.first.name) +
+      tile("Freed up after", money(P.freed) + "/mo", "from " + b2.free + ", for your goals") + '</div>';
+  }
+  $("s-answer").innerHTML = '<h2>The short answer</h2>' + h;
+}
+function tile(k, v, sub){ return '<div class="tile"><small>' + esc(k) + '</small><strong>' + esc(v) + '</strong><span>' + esc(sub) + '</span></div>'; }
+
+/* ---------- debts: strategy tabs, chart, table ---------- */
+function debts(){
+  if (!HAS_DEBT){ $("s-debts").style.display = "none"; return; }
+  var cur = ST[S.view];
+  var h = '<h2>Your debts, month by month</h2><div class="tabs" role="tablist">' +
+    ["avalanche","snowball"].map(function(k){ return '<button role="tab" data-view="' + k + '" aria-selected="' + (S.view === k) + '"' + (S.view === k ? ' class="on"' : '') + '>' + esc(ST[k].name) + (ST.best === k && ST.saving >= 1 ? ' · saves most' : '') + '</button>'; }).join("") + '</div>' +
+    '<p class="why">' + (S.view === "avalanche" ? 'Every extra dollar goes to the debt with the highest interest rate; when it is gone, its payment moves to the next. This usually costs least.' :
+      'Every extra dollar goes to the smallest balance; when it is gone, its payment moves to the next. Quick wins, sometimes a little more interest.') + '</p>' +
+    '<div class="card chartcard"><div class="legend"><span><i style="background:var(--s1)"></i>Highest rate first</span><span><i style="background:var(--s2)"></i>Smallest balance first</span></div>' +
+    '<div class="chart" id="chart"></div>' +
+    '<p class="small">Total still owed at the end of each month. Dots mark the month each debt is paid off.<span class="screen-only"> Hover or tap the chart for exact amounts.</span></p></div>' +
+    '<div class="card" style="margin-top:12px"><div class="scroll"><table><thead><tr><th class="sm-hide">Order</th><th>Debt</th><th class="n">Owed now</th><th class="n sm-hide">Rate</th><th class="n sm-hide">Minimum</th><th class="n">Paid off</th><th class="n sm-hide">Interest</th></tr></thead><tbody>' +
+    cur.order.map(function(o, i){ var d = P.debts.filter(function(x){ return x.name === o.name; })[0];
+      return '<tr><td class="sm-hide">' + (i + 1) + '</td><td>' + esc(o.name) + '</td><td class="n">' + money(d.balance) + '</td><td class="n sm-hide">' + d.apr.toFixed(2).replace(/\.?0+$/, "") + '%</td><td class="n sm-hide">' + money(d.minimum) + '</td><td class="n"><b>' + esc(o.label) + '</b></td><td class="n sm-hide">' + money(o.interest) + '</td></tr>'; }).join("") +
+    '<tr><td class="sm-hide"></td><td><b>Total</b></td><td class="n"><b>' + money(P.debts.reduce(function(t, d){ return t + d.balance; }, 0)) + '</b></td><td class="sm-hide"></td><td class="n sm-hide">' + money(P.budget.minimums) + '</td><td class="n"><b>' + esc(cur.free) + '</b></td><td class="n sm-hide"><b>' + money(cur.interest) + '</b></td></tr>' +
+    '</tbody></table></div><p class="small">Plus ' + money(P.extra) + ' extra a month on top of the minimums' + (P.extra ? '' : ' (none)') + '. When a debt is cleared, its minimum moves to the next one.</p>' +
+    '<details><summary>See the numbers by year</summary><div class="scroll"><table><thead><tr><th>End of</th><th class="n">Highest rate first</th><th class="n">Smallest balance first</th></tr></thead><tbody>' + yearly() + '</tbody></table></div></details></div>';
+  $("s-debts").innerHTML = h;
+  chart();
+}
+function yearly(){
+  var a = ST.avalanche.series, s = ST.snowball.series, n = Math.max(a.length, s.length), out = "";
+  for (var m = 1; m < n; m++){
+    var x = P.startIndex + m - 1;
+    if (x % 12 === 11 || m === n - 1) out += '<tr><td>' + mlabel(m - 1) + '</td><td class="n">' + money(a[Math.min(m, a.length - 1)]) + '</td><td class="n">' + money(s[Math.min(m, s.length - 1)]) + '</td></tr>';
+  }
+  return out;
+}
+
+function chart(){
+  var box = $("chart"), W = Math.max(300, Math.min(900, box.clientWidth || 900)), H = W < 600 ? 240 : 320, L = W < 600 ? 50 : 64, R = 14, T = 14, B = 34;
+  // drawn at the real width, so the axis text stays 12px on a phone instead of shrinking
+  var a = ST.avalanche.series, s = ST.snowball.series, n = Math.max(a.length, s.length) - 1;
+  var max = Math.max(a[0], s[0]), step = niceStep(max / 5), top = Math.ceil(max / step) * step;
+  function X(m){ return L + (W - L - R) * m / Math.max(n, 1); }
+  function Y(v){ return T + (H - T - B) * (1 - v / top); }
+  var g = '';
+  for (var v = 0; v <= top + 0.5; v += step){
+    g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--grid)" stroke-width="1"/>' +
+         '<text x="' + (L - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + short(v) + '</text>';
+  }
+  var every = n > 72 ? 24 : 12;
+  for (var m = 0; m <= n; m++){
+    var x = P.startIndex + m;
+    if (x % 12 === 0 && m % 1 === 0 && ((Math.floor(x / 12)) % (every / 12) === 0))
+      g += '<line x1="' + X(m) + '" x2="' + X(m) + '" y1="' + (H - B) + '" y2="' + (H - B + 5) + '" stroke="var(--soft)"/><text x="' + X(m) + '" y="' + (H - B + 19) + '" text-anchor="middle">' + Math.floor(x / 12) + '</text>';
+  }
+  g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + (H - B) + '" y2="' + (H - B) + '" stroke="var(--soft)" stroke-width="1"/>';
+  function path(sr){ return sr.map(function(v, i){ return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); }).join(" "); }
+  var order = S.view === "avalanche" ? ["snowball","avalanche"] : ["avalanche","snowball"];    // selected drawn last, on top
+  order.forEach(function(k){
+    var on = k === S.view, col = k === "avalanche" ? "var(--s1)" : "var(--s2)";
+    g += '<path d="' + path(ST[k].series) + '" fill="none" stroke="' + col + '" stroke-width="' + (on ? 2.5 : 2) + '" stroke-linejoin="round" stroke-linecap="round" opacity="' + (on ? 1 : .45) + '"/>';
+  });
+  ST[S.view].order.forEach(function(o){
+    var sr = ST[S.view].series, col = S.view === "avalanche" ? "var(--s1)" : "var(--s2)";
+    g += '<circle cx="' + X(o.month) + '" cy="' + Y(sr[o.month]) + '" r="5" fill="' + col + '" stroke="var(--surface)" stroke-width="2"/>';
+  });
+  // one direct label per line, where they are furthest apart, so they never collide
+  var gapAt = 1, gap = -1;
+  for (var i = 1; i < n; i++){ var d = Math.abs((a[i] || 0) - (s[i] || 0)); if (d > gap){ gap = d; gapAt = i; } }
+  var ya = Y(a[Math.min(gapAt, a.length - 1)]), ys = Y(s[Math.min(gapAt, s.length - 1)]);
+  if (Math.abs(ya - ys) >= 16){
+    var hi = ya < ys ? "a" : "s";
+    g += '<text class="lbl" x="' + (X(gapAt) + 8) + '" y="' + ((hi === "a" ? ya : ys) - 8) + '">' + (hi === "a" ? "Highest rate first" : "Smallest balance first") + '</text>' +
+         '<text class="lbl" x="' + (X(gapAt) + 8) + '" y="' + ((hi === "a" ? ys : ya) + 18) + '">' + (hi === "a" ? "Smallest balance first" : "Highest rate first") + '</text>';
+  }
+  var overlap = Math.abs(ya - ys) < 16;
+  g += '<line id="xh" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" stroke="var(--soft)" stroke-dasharray="3 3" visibility="hidden"/>' +
+       '<rect id="hit" x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B) + '" fill="transparent"/>';
+  var note = overlap ? '<p class="small" id="overlap">The two lines sit almost on top of each other: here the two ways of paying off cost nearly the same (' + money(ST.saving) + ' apart).<span class="screen-only"> Switch tabs to see each order of payoffs.</span></p>' : '';
+  box.innerHTML = note + '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Total owed each month under both ways of paying off">' + g + '</svg><div class="tip" id="tip"></div>';
+  var svg = box.querySelector("svg"), tip = $("tip"), xh = $("xh");
+  function show(ev){
+    var r = svg.getBoundingClientRect(), px = (ev.clientX - r.left) * W / r.width;
+    var m = Math.max(0, Math.min(n, Math.round((px - L) / (W - L - R) * n)));
+    xh.setAttribute("x1", X(m)); xh.setAttribute("x2", X(m)); xh.setAttribute("visibility", "visible");
+    tip.innerHTML = '<b>' + (m === 0 ? "Today" : "End of " + mlabel(m - 1)) + '</b><i style="background:var(--s1)"></i>Highest rate first ' + money(a[Math.min(m, a.length - 1)]) +
+                    '<br><i style="background:var(--s2)"></i>Smallest balance first ' + money(s[Math.min(m, s.length - 1)]);
+    tip.style.display = "block";
+    var left = X(m) * r.width / W + 12; if (left + tip.offsetWidth > r.width) left = X(m) * r.width / W - tip.offsetWidth - 12;
+    tip.style.left = left + "px"; tip.style.top = "8px";
+  }
+  function hide(){ tip.style.display = "none"; xh.setAttribute("visibility", "hidden"); }
+  svg.addEventListener("pointermove", show); svg.addEventListener("pointerdown", show); svg.addEventListener("pointerleave", hide);
+}
+function niceStep(raw){ var p = Math.pow(10, Math.floor(Math.log10(Math.max(raw, 1)))), f = raw / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
+function short(v){ return v >= 1000 ? P.sym + (v / 1000).toLocaleString("en-US", { maximumFractionDigits: 1 }) + "k" : P.sym + v; }
+
+/* ---------- goals ---------- */
+function goals(){
+  if (!P.goals.length){ $("s-goals").style.display = "none"; return; }
+  $("s-goals").innerHTML = '<h2>Your goals</h2><div class="goals">' + P.goals.map(function(g){
+    var pct = Math.min(100, Math.round(g.saved / g.target * 100));
+    return '<div class="card goal"><small>' + esc(g.name) + ' · by ' + esc(g.by) + '</small><strong>' + money(g.monthly) + ' a month</strong>' +
+      '<div class="meter" role="img" aria-label="' + pct + '% saved so far"><i style="width:' + pct + '%"></i></div>' +
+      '<small>' + money(g.saved) + ' of ' + money(g.target) + ' saved so far · ' + plural(g.months, "month") + ' to go · assumes ' + g.ret + '% a year interest' + (g.stretch ? ' · <b>stretch goal</b>' : '') + '</small></div>';
+  }).join("") + '</div>';
+}
+
+/* ---------- does it fit? ---------- */
+function fit(){
+  var b = P.budget, rows = [];
+  if (HAS_DEBT) rows.push(["Minimum payments on your debts", b.minimums], ["Extra toward your debts", b.extra]);
+  P.goals.forEach(function(g){ rows.push(["Saving for " + g.name, g.monthly]); });
+  var ok = !b.short;
+  var icon = ok ? '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="currentColor"/><path d="M5 9.5l2.6 2.5L13 6.5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'
+                : '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 1.5L17 16H1z" fill="currentColor"/><path d="M9 6.5v4.5M9 13.2v.3" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
+  $("s-fit").innerHTML = '<h2>Does it fit?</h2><div class="card"><div class="fit">' +
+    rows.map(function(r){ return '<div class="row"><span>' + esc(r[0]) + '</span><span>' + money(r[1]) + '</span></div>'; }).join("") +
+    '<div class="row total"><span>This plan needs each month</span><span>' + money(b.need) + '</span></div>' +
+    '<div class="row"><span>You said you can put in</span><span>' + money(b.monthly) + '</span></div></div>' +
+    '<div class="status ' + (ok ? 'ok' : 'short') + '" role="status">' + icon + '<span>' +
+    (ok ? 'It fits, with ' + money(b.monthly - b.need) + ' a month to spare.' : 'Short by ' + money(b.short) + ' a month. You marked this as a stretch: a later date or a smaller target would close the gap.') +
+    '</span></div></div>';
+}
+
+/* ---------- what it assumes ---------- */
+function assume(){
+  var h = '<h2>What this plan assumes</h2><div class="card"><ul class="assume">';
+  if (HAS_DEBT) h += '<li>Every payment is made every month, interest rates stay where they are, and nothing new goes on the cards.</li>';
+  if (P.goals.length) h += '<li>Savings earn the yearly rate shown on each goal. That is an assumption, not a promise.</li>';
+  h += '<li>These numbers are a plan worked out from what you entered on ' + esc(P.builtOn) + ', not a guarantee. Change the figures and ask for a new page whenever things change.</li></ul></div>';
+  $("s-assume").innerHTML = h;
+  $("foot").textContent = "Plan starts " + P.start + " · made " + P.builtOn + ".";
+}
+
+function draw(){ answer(); debts(); goals(); fit(); assume(); }
+
+document.addEventListener("click", function(ev){
+  var el = ev.target;
+  while (el && el !== document && !(el.getAttribute && (el.hasAttribute("data-view") || el.hasAttribute("data-act") || el.hasAttribute("data-pop") || el.hasAttribute("data-bg") || el.hasAttribute("data-font")))) el = el.parentNode;
+  if (el === document.documentElement) el = document; /* <html> carries data-font/data-bg for the look: a tap on blank space is not a menu choice */
+  var pops = document.querySelectorAll(".pop");
+  if (!el || el === document){ for (var i = 0; i < pops.length; i++) pops[i].classList.remove("open"); return; }
+  if (el.hasAttribute("data-pop")){ $("pop-" + el.getAttribute("data-pop")).classList.toggle("open"); return; }
+  if (el.hasAttribute("data-view")){ S.view = el.getAttribute("data-view"); save(); debts(); return; }
+  if (el.hasAttribute("data-bg")){ S.look.bg = el.getAttribute("data-bg"); save(); applyLook(); return; }
+  if (el.hasAttribute("data-font")){ S.look.font = el.getAttribute("data-font"); save(); applyLook(); return; }
+  if (el.getAttribute("data-act") === "print"){ var d = document.querySelector("details"); if (d) d.open = true; window.print(); }
+});
+
+$("title").textContent = P.title; $("sub").textContent = P.subtitle || "";
+applyLook(); draw();
+var rw = 0; window.addEventListener("resize", function(){ var w = $("chart") && $("chart").clientWidth; if (w && Math.abs(w - rw) > 40){ rw = w; chart(); } });
+window.__plan = { state: function(){ return S; } };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "id": "under-the-sea",
+  "title": "Under the Sea",
+  "subtitle": "A crossword for Maya, age 9",
+  "age": 9,
+  "builtOn": "6 October 2026",
+  "look": {"font": "rounded", "bg": "sky"},
+  "words": [
+    {"answer": "Octopus", "clue": "Eight arms, three hearts and blue blood"},
+    {"answer": "Dolphin", "clue": "A clever sea mammal that clicks and whistles to talk"},
+    {"answer": "Shark", "clue": "A fish that keeps growing new teeth all its life"},
+    {"answer": "Coral reef", "clue": "Busy underwater home built by tiny animals"},
+    {"answer": "Whale", "clue": "The blue one is the biggest animal that has ever lived"},
+    {"answer": "Seahorse", "clue": "In this fish, the dad carries the babies"},
+    {"answer": "Jellyfish", "clue": "No brain, no bones, and it can sting"},
+    {"answer": "Starfish", "clue": "It can grow back a lost arm"},
+    {"answer": "Turtle", "clue": "Swims for years, then comes back to the beach where it hatched to lay eggs"},
+    {"answer": "Crab", "clue": "Walks sideways and carries its skeleton on the outside"},
+    {"answer": "Penguin", "clue": "A bird that cannot fly but swims brilliantly"},
+    {"answer": "Seaweed", "clue": "Ocean plant-like algae that some people eat in sushi"}
+  ]
+}

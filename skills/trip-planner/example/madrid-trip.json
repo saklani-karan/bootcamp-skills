@@ -1,0 +1,1042 @@
+{
+ "page_title": "Madrid and Barcelona",
+ "eyebrow": "TRIP BRIEF · 5–12 DECEMBER 2026",
+ "title_html": "Madrid <em>and</em> Barcelona",
+ "subtitle": "Two bases, one fast train, and a snow day bolted on — because the brief asked for snow and Spain does not have any.",
+ "asof": "2 October 2026",
+ "footer": "Madrid and Barcelona · 5–12 Dec 2026 · built 2 Oct 2026",
+ "facts": [
+  {
+   "label": "TRAVELLERS",
+   "value": "4",
+   "note": "2 adults · twins, 10"
+  },
+  {
+   "label": "NIGHTS",
+   "value": "6",
+   "note": "3 Madrid · 3 Barcelona"
+  },
+  {
+   "label": "ESTIMATE",
+   "value": "$6,450",
+   "note": "to $8,300 · cap $7,000"
+  },
+  {
+   "label": "FROM",
+   "value": "SFO",
+   "note": "open-jaw via Barcelona"
+  },
+  {
+   "label": "PASSPORTS",
+   "value": "US ×4",
+   "note": "valid to 12 Jun 2027"
+  }
+ ],
+ "critical": {
+  "headline": "You asked for cold and snow. Spain in December has neither.",
+  "detail": "Madrid runs 1–5 °C overnight and 10–13 °C by day; Barcelona 8.5–13.4 °C. Neither city gets snow. Monday is a deliberate snow day in the Sierra de Guadarrama to answer that — and it is the one thing on this page that may not happen, because the season only opens in early December."
+ },
+ "toc_groups": [
+  [
+   "Decide",
+   "before you book"
+  ],
+  [
+   "The week",
+   "what you'll do"
+  ],
+  [
+   "Practical",
+   "money and the rest"
+  ]
+ ],
+ "sections": [
+  {
+   "id": "route",
+   "title": "The route",
+   "tag": "2 bases · 1 snow day",
+   "kind": "diagram",
+   "group": "Decide",
+   "short": "Route",
+   "note_html": "Fly into Madrid, out of Barcelona, so no leg is retraced. The AVE does the middle in 2 h 30."
+  },
+  {
+   "id": "weather",
+   "title": "Weather, day by day",
+   "tag": "by place, by date",
+   "kind": "8 days",
+   "group": "Decide",
+   "short": "Weather",
+   "note_html": "Every row is the long-term average for <em>that place on that date</em>. The mountain is a different climate from the cities."
+  },
+  {
+   "id": "flights",
+   "title": "Flights",
+   "tag": "outbound and home",
+   "kind": "2 cards",
+   "group": "Decide",
+   "short": "Flights",
+   "note_html": "Iberia is the only nonstop from San Francisco to Madrid, and it runs Tuesdays, Thursdays and Saturdays. 5 December is a Saturday."
+  },
+  {
+   "id": "hotels",
+   "title": "Where you sleep",
+   "tag": "2 bases · one room each",
+   "kind": "2 hotels",
+   "group": "Decide",
+   "short": "Hotels",
+   "note_html": "Both picked for a single room or apartment that sleeps four."
+  },
+  {
+   "id": "before",
+   "title": "Before you leave",
+   "tag": "today → departure",
+   "kind": "timeline",
+   "group": "The week",
+   "short": "Before you leave",
+   "note_html": "Passports and flights decide the trip. The snow day cannot be booked until the season opens."
+  },
+  {
+   "id": "week",
+   "title": "The week",
+   "tag": "one or two anchors a day",
+   "kind": "8 days",
+   "group": "The week",
+   "short": "The week",
+   "note_html": "Spain eats late and starts late, and sunset is at 17:49 — nearly two hours later than central Europe. Mornings are slower here on purpose."
+  },
+  {
+   "id": "places",
+   "title": "The places",
+   "tag": "8 stops · times and prices",
+   "kind": "8 stops",
+   "group": "The week",
+   "short": "The places",
+   "note_html": "Children under 18 are free at the Prado. Everything marked with a dot still needs checking on the operator's own site."
+  },
+  {
+   "id": "reviews",
+   "title": "What travellers say",
+   "tag": "6 picks · and what changed",
+   "kind": "6 verdicts",
+   "group": "The week",
+   "short": "Travellers"
+  },
+  {
+   "id": "budget",
+   "title": "Budget",
+   "tag": "two fare scenarios vs $7,000",
+   "kind": "chart",
+   "group": "Practical",
+   "short": "Budget",
+   "note_html": "Unlike a central-European December, this one fits — at the low end. Spain is the cheaper half of the comparison."
+  },
+  {
+   "id": "planb",
+   "title": "If the snow does not come",
+   "tag": "the one real risk",
+   "kind": "flow",
+   "group": "Practical",
+   "short": "Snow risk"
+  },
+  {
+   "id": "ground",
+   "title": "On the ground",
+   "tag": "nine things to know",
+   "kind": "9 tiles",
+   "group": "Practical",
+   "short": "On the ground"
+  },
+  {
+   "id": "bookings",
+   "title": "Booked / not booked",
+   "tag": "write the confirmation in by hand",
+   "kind": "checklist",
+   "group": "Practical",
+   "short": "Bookings"
+  },
+  {
+   "id": "addresses",
+   "title": "Addresses and numbers",
+   "tag": "show a driver the Spanish",
+   "kind": "table",
+   "group": "Practical",
+   "short": "Addresses"
+  }
+ ],
+ "photos": [
+  {
+   "key": "mayor",
+   "label": "Plaza Mayor, Madrid",
+   "wiki": "Plaza Mayor, Madrid",
+   "hero": true,
+   "alt": "Plaza Mayor in Madrid, arcaded square.",
+   "caption": "Plaza Mayor · Madrid"
+  },
+  {
+   "key": "prado",
+   "label": "Museo del Prado",
+   "wiki": "Museo del Prado",
+   "alt": "The Prado's main facade."
+  },
+  {
+   "key": "palace",
+   "label": "Royal Palace of Madrid",
+   "wiki": "Royal Palace of Madrid",
+   "alt": "The Royal Palace of Madrid."
+  },
+  {
+   "key": "sagrada",
+   "label": "Sagrada Família",
+   "wiki": "Sagrada Família",
+   "alt": "The Sagrada Família towers."
+  },
+  {
+   "key": "guell",
+   "label": "Park Güell",
+   "wiki": "Park Güell",
+   "alt": "Park Güell's terrace and mosaics."
+  },
+  {
+   "key": "cathedral",
+   "label": "Barcelona Cathedral",
+   "wiki": "Barcelona Cathedral",
+   "alt": "Barcelona Cathedral in the Gothic Quarter."
+  },
+  {
+   "key": "sierra",
+   "label": "Sierra de Guadarrama",
+   "wiki": "Sierra de Guadarrama",
+   "alt": "Snow on the Sierra de Guadarrama."
+  },
+  {
+   "key": "ave",
+   "label": "AVE high-speed train",
+   "wiki": "AVE Class 103",
+   "search": [
+    "Renfe AVE train high speed",
+    "AVE Class 103 train"
+   ],
+   "must": [
+    "ave",
+    "renfe",
+    "103"
+   ],
+   "alt": "A Renfe AVE high-speed train."
+  },
+  {
+   "key": "navac",
+   "label": "Navacerrada Pass",
+   "wiki": "Navacerrada Pass",
+   "alt": "The Navacerrada Pass."
+  },
+  {
+   "key": "cristal",
+   "label": "Palacio de Cristal, Retiro",
+   "wiki": "Palacio de Cristal del Retiro",
+   "alt": "The Palacio de Cristal in the Retiro park."
+  }
+ ],
+ "route": [
+  {
+   "kind": "stop",
+   "name": "San Francisco",
+   "meta": "Depart Sat 5 Dec"
+  },
+  {
+   "kind": "leg",
+   "label_html": "Fly 11 h 25 · <a href=\"https://www.iberia.com/\">Iberia IB356</a>, the only nonstop"
+  },
+  {
+   "kind": "base",
+   "name": "Madrid",
+   "nights": "3 nights",
+   "tone": "s",
+   "photo": "mayor",
+   "alt": "Plaza Mayor, Madrid.",
+   "meta_html": "6–9 Dec · <a href=\"https://www.room-matehotels.com/en/laura/\">Room Mate Laura</a>",
+   "trips": [
+    {
+     "tag": "Snow day",
+     "html": "<a href=\"https://www.valdesqui.es/\">Valdesquí</a> or <a href=\"https://www.puertonavacerrada.com/\">Puerto de Navacerrada</a> · Mon 7 · about 2 h each way"
+    },
+    {
+     "tag": "In the city",
+     "html": "<a href=\"https://www.museodelprado.es/en/visit-the-museum\">the Prado</a> and the <a href=\"https://www.esmadrid.com/en/whats-on/plaza-mayor-christmas-market\">Plaza Mayor market</a> · Tue 8"
+    }
+   ]
+  },
+  {
+   "kind": "leg",
+   "label_html": "<a href=\"https://www.renfe.com/es/en\">AVE</a> 2 h 30 · up to 35 trains a day"
+  },
+  {
+   "kind": "base",
+   "name": "Barcelona",
+   "nights": "3 nights",
+   "tone": "v",
+   "photo": "sagrada",
+   "alt": "The Sagrada Família.",
+   "meta_html": "9–12 Dec · <a href=\"https://hotellapau.com/en/\">Hotel La Pau</a>",
+   "trips": [
+    {
+     "tag": "In the city",
+     "html": "<a href=\"https://sagradafamilia.org/en/\">Sagrada Família</a> and <a href=\"https://parkguell.barcelona/en/planning-your-visit/prices-and-times\">Park Güell</a> · Thu 10"
+    },
+    {
+     "tag": "In the city",
+     "html": "Gothic Quarter and the <a href=\"https://irbarcelona.org/christmas-barcelona/fira-santa-llucia-market/\">Fira de Santa Llúcia</a> · Fri 11"
+    }
+   ]
+  },
+  {
+   "kind": "leg",
+   "label_html": "Fly home Sat 12 Dec · one stop in Madrid"
+  },
+  {
+   "kind": "stop",
+   "name": "San Francisco",
+   "meta": "Home Sat 12 Dec",
+   "end": true
+  }
+ ],
+ "weather_notice": {
+  "headline": "No forecast exists for these dates yet",
+  "detail_html": "A reliable one appears about ten days out — from roughly <strong>25 November</strong>. These are long-term averages for each place on each date. The mountain row is derived from altitude, not a published average, and is the one to check hardest."
+ },
+ "weather": [
+  {
+   "day": "Sat 5",
+   "where_html": "In the air",
+   "temp_html": "—",
+   "light": "—",
+   "travel": true,
+   "note_html": "SFO late afternoon, overnight to Madrid."
+  },
+  {
+   "day": "Sun 6",
+   "where_html": "<strong>Madrid</strong>",
+   "temp_html": "<span class=\"hi\">10–13 °C</span> / <span class=\"lo\">1–5 °C</span>",
+   "light": "08:21 – 17:49",
+   "note_html": "Land early afternoon. Dry and bright, far milder than you asked for."
+  },
+  {
+   "day": "Mon 7",
+   "where_html": "<strong>Sierra de Guadarrama</strong>, ~1,860 m",
+   "key": true,
+   "temp_html": "<span class=\"lo\">about −2 to +2 °C</span>",
+   "derived": true,
+   "check": true,
+   "light": "exposed slopes",
+   "note_html": "Roughly 12 °C colder than Madrid. Whether there is snow at all depends on the season opening — check <a href=\"https://www.valdesqui.es/\">Valdesquí</a> before you go."
+  },
+  {
+   "day": "Tue 8",
+   "where_html": "<strong>Madrid</strong>",
+   "temp_html": "<span class=\"hi\">10–13 °C</span> / <span class=\"lo\">1–5 °C</span>",
+   "light": "08:22 – 17:49",
+   "note_html": "Museums are indoors; the market runs to 21:00."
+  },
+  {
+   "day": "Wed 9",
+   "where_html": "Madrid → <strong>Barcelona</strong>",
+   "temp_html": "<span class=\"hi\">13 °C</span> / <span class=\"lo\">8 °C</span>",
+   "light": "08:04 – 17:22",
+   "note_html": "On the AVE through the middle of it. Barcelona is noticeably milder."
+  },
+  {
+   "day": "Thu 10",
+   "where_html": "<strong>Barcelona</strong>",
+   "temp_html": "<span class=\"hi\">13.4 °C</span> / <span class=\"lo\">8.5 °C</span>",
+   "light": "08:05 – 17:23",
+   "note_html": "<a href=\"https://parkguell.barcelona/en/planning-your-visit/prices-and-times\">Park Güell</a> closes at 17:30 from November, so it is a morning or early-afternoon job."
+  },
+  {
+   "day": "Fri 11",
+   "where_html": "<strong>Barcelona</strong>",
+   "temp_html": "<span class=\"hi\">13.4 °C</span> / <span class=\"lo\">8.5 °C</span>",
+   "light": "08:06 – 17:23",
+   "note_html": "Only about 5–6 rainy days in a Barcelona December, so odds are good."
+  },
+  {
+   "day": "Sat 12",
+   "where_html": "Barcelona → home",
+   "temp_html": "—",
+   "light": "—",
+   "travel": true,
+   "note_html": "Nothing outdoors."
+  }
+ ],
+ "weather_stats": [
+  {
+   "n": "9 h 26",
+   "label": "of daylight in Madrid on 7 December, with sunset at 17:49 — almost two hours later than Salzburg"
+  },
+  {
+   "n": "0",
+   "label": "days of snow you should expect in either city; the snow has to be gone and got"
+  },
+  {
+   "n": "104 h",
+   "label": "of sunshine in an average Barcelona December, its least sunny month"
+  }
+ ],
+ "weather_sources_html": "Averages: <a href=\"https://weather-and-climate.com/Madrid-December-averages\">Madrid</a> · <a href=\"https://weather-and-climate.com/barcelona-December-averages\">Barcelona</a>. Daylight: <a href=\"https://sunrise-sunset.org/es/madrid\">Madrid</a>. The mountain figure is derived from altitude, not a published average.",
+ "flights": [
+  {
+   "tag": "Outbound · Sat 5 Dec",
+   "tone": "out",
+   "pill": "Only nonstop",
+   "legs": [
+    {
+     "route": "SFO → MAD",
+     "note": "next day",
+     "sub_html": "<a href=\"https://www.iberia.com/\">Iberia IB356</a> · nonstop · 11 h 25 · Airbus A330",
+     "quiet": "Iberia flies this route Tuesdays, Thursdays and Saturdays only — 5 December is a Saturday, which is why the dates work."
+    }
+   ],
+   "alt_html": "<b>Exact times change by season.</b> Confirm the December timetable when you book — <a href=\"https://www.google.com/travel/flights/flights-from-san-francisco-to-madrid.html?gl=US&amp;hl=en-US\">compare fares</a>.",
+   "fare": {
+    "text": "price",
+    "check": true
+   }
+  },
+  {
+   "tag": "Home · Sat 12 Dec",
+   "tone": "home",
+   "pill": "One stop",
+   "legs": [
+    {
+     "route": "BCN → MAD → SFO",
+     "sub_html": "Iberia, connecting in Madrid · <a href=\"https://www.google.com/travel/flights/flights-from-barcelona-to-san-francisco.html?gl=US&amp;hl=en-US\">compare fares</a>",
+     "quiet": "Book the whole thing as one multi-city ticket so a missed connection is the airline's problem."
+    }
+   ],
+   "alt_html": "<b>Flying home from Barcelona rather than Madrid</b> saves a 2 h 30 train back. That is the point of the open jaw.",
+   "fare": {
+    "text": "price",
+    "check": true
+   }
+  }
+ ],
+ "fare_note": {
+  "headline_html": "Fares for four in December were not confirmed against a live booking.",
+  "detail_html": "Headline deal fares advertised for this route sit near $330 return, but those are off-peak singles and rarely survive four seats in December. Budget on the range below, not the headline."
+ },
+ "hotels": [
+  {
+   "name_html": "<a href=\"https://www.room-matehotels.com/en/laura/\">Room Mate Laura</a>",
+   "when": "Madrid · 6–9 Dec",
+   "tone": "s",
+   "photo": "mayor",
+   "alt": "Plaza Mayor, Madrid.",
+   "photo_caption": "Plaza Mayor — the square it sits beside, not the hotel",
+   "meta": "Off a small square by Plaza Mayor",
+   "rate": {
+    "text": "price",
+    "check": true
+   },
+   "score": "—",
+   "score_src": "rate not confirmed",
+   "verdicts": [
+    {
+     "kind": "plus",
+     "label": "Loved",
+     "text": "Duplex rooms that genuinely sleep four, central location"
+    },
+    {
+     "kind": "minus",
+     "label": "Watch",
+     "text": "Nothing verified here — no rate and no score were confirmed"
+    }
+   ],
+   "so": "Treat this as a candidate, not a recommendation. Check it yourself before booking."
+  },
+  {
+   "name_html": "<a href=\"https://hotellapau.com/en/\">Hotel La Pau</a>",
+   "when": "Barcelona · 9–12 Dec",
+   "tone": "v",
+   "photo": "cathedral",
+   "alt": "Barcelona Cathedral.",
+   "photo_caption": "Barcelona Cathedral — the quarter it sits in, not the hotel",
+   "meta": "Family rooms in the Gothic Quarter",
+   "rate": {
+    "text": "price",
+    "check": true
+   },
+   "score": "—",
+   "score_src": "rate not confirmed",
+   "verdicts": [
+    {
+     "kind": "plus",
+     "label": "Loved",
+     "text": "Spacious family rooms, in the heart of the Gothic Quarter"
+    },
+    {
+     "kind": "minus",
+     "label": "Watch",
+     "text": "Also unverified — confirm one room genuinely sleeps four"
+    }
+   ],
+   "so": "The first candidate I tried had no working website at all. Check this one before booking."
+  }
+ ],
+ "hotels_gap_html": "<b>Neither hotel rate was confirmed and neither score was checked.</b> They came from a single round of searching and are shown as candidates so the shape of the trip is visible. This is the weakest section on the page, and it is marked that way rather than dressed up.",
+ "deadlines": [
+  {
+   "date": "Oct 2",
+   "what": "Today",
+   "kind": "now"
+  },
+  {
+   "date": "Oct 5",
+   "what": "Check all four passports",
+   "kind": "crit",
+   "pill": "No trip if missed"
+  },
+  {
+   "date": "Oct 9",
+   "what": "Book flights — Iberia runs this route three days a week",
+   "kind": "key",
+   "pill": "Budget hinges on it"
+  },
+  {
+   "date": "Oct 9",
+   "what": "Book both hotels, confirming a room that sleeps four"
+  },
+  {
+   "date": "Nov 1",
+   "what": "Check whether ETIAS has launched",
+   "kind": "crit",
+   "pill": "No trip if missed"
+  },
+  {
+   "date": "Nov 15",
+   "what": "Book the AVE — children under 14 are €5 on Avlo fares"
+  },
+  {
+   "date": "Nov 20",
+   "what": "Book Sagrada Família and Park Güell time slots"
+  },
+  {
+   "date": "Nov 28",
+   "what": "Check whether the Guadarrama season has opened"
+  },
+  {
+   "date": "Dec 1",
+   "what": "Insurance, eSIMs, print everything"
+  },
+  {
+   "date": "Dec 5",
+   "what": "Depart SFO",
+   "kind": "go"
+  }
+ ],
+ "days": [
+  {
+   "day": "Sat 5",
+   "where": "in the air",
+   "main_html": "Iberia IB356, SFO to Madrid, nonstop",
+   "sub_html": "11 h 25 overnight · the only direct flight on this route",
+   "pill": "Travel",
+   "pill_tone": "mute"
+  },
+  {
+   "day": "Sun 6",
+   "where": "Madrid",
+   "tone": "s",
+   "photo": "mayor",
+   "alt": "Plaza Mayor, Madrid.",
+   "main_html": "Land early afternoon, settle, walk the centre",
+   "sub_html": "Evening: the <a href=\"https://www.esmadrid.com/en/whats-on/plaza-mayor-christmas-market\">Plaza Mayor market</a>, open to 21:00 · eat late, like everyone else",
+   "pill": "Light",
+   "pill_tone": "good"
+  },
+  {
+   "day": "Mon 7",
+   "where": "Sierra",
+   "tone": "s",
+   "photo": "sierra",
+   "alt": "Snow in the Sierra de Guadarrama.",
+   "main_html": "Snow day — Sierra de Guadarrama, about 2 h each way",
+   "sub_html": "<a href=\"https://www.valdesqui.es/\">Valdesquí</a> has a ski school and green runs · <strong>only if the season has opened</strong>",
+   "pill": "Full",
+   "pill_tone": "warn"
+  },
+  {
+   "day": "Tue 8",
+   "where": "Madrid",
+   "tone": "s",
+   "photo": "prado",
+   "alt": "The Prado.",
+   "main_html": "<a href=\"https://www.museodelprado.es/en/visit-the-museum\">The Prado</a> in the morning — free for under-18s",
+   "sub_html": "Afternoon: <a href=\"https://www.patrimonionacional.es/en/royal-site/royal-palace-madrid\">the Royal Palace</a> · market again after dark",
+   "pill": "Full",
+   "pill_tone": "warn"
+  },
+  {
+   "day": "Wed 9",
+   "where": "to Barcelona",
+   "tone": "v",
+   "photo": "ave",
+   "alt": "An AVE train.",
+   "main_html": "<a href=\"https://www.renfe.com/es/en\">AVE</a> late morning, 2 h 30",
+   "sub_html": "Evening: <a href=\"https://irbarcelona.org/christmas-barcelona/fira-santa-llucia-market/\">Fira de Santa Llúcia</a> by the cathedral, to 21:00",
+   "pill": "Light",
+   "pill_tone": "good"
+  },
+  {
+   "day": "Thu 10",
+   "where": "Barcelona",
+   "tone": "v",
+   "photo": "sagrada",
+   "alt": "The Sagrada Família.",
+   "main_html": "<a href=\"https://sagradafamilia.org/en/\">Sagrada Família</a> first thing, booked slot",
+   "sub_html": "Then <a href=\"https://parkguell.barcelona/en/planning-your-visit/prices-and-times\">Park Güell</a> — it shuts at 17:30 in December, so do not leave it late",
+   "pill": "Full",
+   "pill_tone": "warn"
+  },
+  {
+   "day": "Fri 11",
+   "where": "Barcelona",
+   "tone": "v",
+   "photo": "cathedral",
+   "alt": "Barcelona Cathedral.",
+   "main_html": "Gothic Quarter on foot, nothing booked",
+   "sub_html": "Afternoon deliberately free · the beach is walkable and empty in December",
+   "pill": "Light",
+   "pill_tone": "good"
+  },
+  {
+   "day": "Sat 12",
+   "where": "home",
+   "main_html": "Barcelona to Madrid, Madrid to San Francisco",
+   "sub_html": "One stop · nothing planned that morning",
+   "pill": "Travel",
+   "pill_tone": "mute"
+  }
+ ],
+ "places": [
+  {
+   "when": "Mon 7 Dec · day trip",
+   "tone": "s",
+   "name_html": "<a href=\"https://www.valdesqui.es/\">Valdesquí</a>",
+   "price": {
+    "text": "price",
+    "check": true
+   },
+   "extra": "about 2 h each way",
+   "note": "22 km of runs, 12 of them green, with a ski school and a beginners' snow area. The season opens in early December — this is the one booking that may simply not exist."
+  },
+  {
+   "when": "Mon 7 Dec · alternative",
+   "tone": "s",
+   "name_html": "<a href=\"https://www.puertonavacerrada.com/\">Puerto de Navacerrada</a>",
+   "photo": "navac",
+   "alt": "The Navacerrada Pass.",
+   "price": {
+    "text": "price",
+    "check": true
+   },
+   "extra": "1 h 30 – 2 h",
+   "note": "Smaller, about 10 km of trails, and reviewers call it the friendlier of the two for children who have never skied."
+  },
+  {
+   "when": "Tue 8 Dec · 10:00",
+   "tone": "s",
+   "name_html": "<a href=\"https://www.museodelprado.es/en/visit-the-museum\">Museo del Prado</a>",
+   "photo": "prado",
+   "alt": "The Prado.",
+   "price": {
+    "text": "€15 adults · under-18s free",
+    "source": "https://www.museodelprado.es/en/visit-the-museum"
+   },
+   "extra": "Mon–Sat 10:00–20:00",
+   "note": "Children and teenagers are free at any time, though they still need a timed ticket. Entry is free for everyone from 18:00."
+  },
+  {
+   "when": "Tue 8 Dec · afternoon",
+   "tone": "s",
+   "name_html": "<a href=\"https://www.patrimonionacional.es/en/royal-site/royal-palace-madrid\">Royal Palace of Madrid</a>",
+   "photo": "palace",
+   "alt": "The Royal Palace of Madrid.",
+   "price": {
+    "text": "€24",
+    "source": "https://www.patrimonionacional.es/en/royal-site/royal-palace-madrid"
+   },
+   "extra": "hours vary",
+   "note": "The largest functioning royal palace in Europe by floor area. Hours shift around state occasions, so check the week before."
+  },
+  {
+   "when": "Tue 8 Dec · evening",
+   "tone": "s",
+   "name_html": "<a href=\"https://www.esmadrid.com/en/whats-on/plaza-mayor-christmas-market\">Plaza Mayor Christmas market</a>",
+   "price": {
+    "text": "free entry",
+    "source": "https://www.esmadrid.com/en/whats-on/plaza-mayor-christmas-market"
+   },
+   "extra": "to 21:00, 22:00 Fri–Sat",
+   "note": "104 stalls, running to 31 December. Heavy on nativity figures, toys and joke items rather than food."
+  },
+  {
+   "when": "Thu 10 Dec · 09:00",
+   "tone": "v",
+   "name_html": "<a href=\"https://sagradafamilia.org/en/\">Sagrada Família</a>",
+   "photo": "sagrada",
+   "alt": "The Sagrada Família.",
+   "price": {
+    "text": "price",
+    "check": true
+   },
+   "extra": "booked slot",
+   "note": "Published prices disagree badly between resellers and the basilica's own site, so none is quoted here. Book direct and check what a ten-year-old costs — the under-10 concession will not apply to twins who have just turned ten."
+  },
+  {
+   "when": "Thu 10 Dec · afternoon",
+   "tone": "v",
+   "name_html": "<a href=\"https://parkguell.barcelona/en/planning-your-visit/prices-and-times\">Park Güell</a>",
+   "photo": "guell",
+   "alt": "Park Güell.",
+   "price": {
+    "text": "€18 adults · €13.50 ages 7–12",
+    "source": "https://parkguell.barcelona/en/planning-your-visit/prices-and-times"
+   },
+   "extra": "09:30–17:30 Nov–Dec",
+   "note": "The winter closing time is the thing to plan around: 17:30, not 19:30. Arrive by 15:00 or it is not worth the fare."
+  },
+  {
+   "when": "Wed 9 & Fri 11 · evening",
+   "tone": "v",
+   "name_html": "<a href=\"https://irbarcelona.org/christmas-barcelona/fira-santa-llucia-market/\">Fira de Santa Llúcia</a>",
+   "price": {
+    "text": "free entry",
+    "source": "https://irbarcelona.org/christmas-barcelona/fira-santa-llucia-market/"
+   },
+   "extra": "27 Nov – 23 Dec · to 21:00",
+   "note": "In front of the cathedral in the Gothic Quarter. Smaller and older than Madrid's, and the caga tió stalls will need explaining to the boys."
+  }
+ ],
+ "reviews": [
+  {
+   "name": "Valdesquí",
+   "source": "ski guides",
+   "loved": "Green runs and a ski school aimed squarely at first-timers",
+   "watch": "Season opening depends on snowfall; early December is the very start",
+   "so": "Keep it, but treat it as provisional and have Tuesday ready to swap",
+   "verdict": "Provisional",
+   "tone": "warn"
+  },
+  {
+   "name": "Navacerrada",
+   "source": "ski guides",
+   "loved": "Friendlier and cheaper for small children than Valdesquí",
+   "watch": "Only about 10 km of trails",
+   "so": "The better first choice if the boys have never skied",
+   "verdict": "Added",
+   "tone": "cool"
+  },
+  {
+   "name": "The Prado",
+   "source": "visitor guides",
+   "loved": "Free for under-18s, and free for all after 18:00",
+   "watch": "Enormous — a full pass is an endurance test for a ten-year-old",
+   "so": "Go at opening, pick three rooms, leave",
+   "verdict": "Changed",
+   "tone": "cool"
+  },
+  {
+   "name": "Park Güell",
+   "source": "official hours",
+   "loved": "The mosaics and the view over the city",
+   "watch": "Closes 17:30 in winter, not 19:30",
+   "so": "Moved to early afternoon so it is not lost",
+   "verdict": "Changed",
+   "tone": "cool"
+  },
+  {
+   "name": "Sagrada Família",
+   "source": "ticket sites",
+   "loved": "The thing everyone remembers from Barcelona",
+   "watch": "Quoted prices vary wildly between resellers and the official site",
+   "so": "Book direct only; no price quoted here until you confirm it",
+   "verdict": "Unresolved",
+   "tone": "warn"
+  },
+  {
+   "name": "Plaza Mayor market",
+   "source": "city tourist board",
+   "loved": "104 stalls, open to 31 December",
+   "watch": "Nativity figures and joke items, not a food market",
+   "so": "Go for the atmosphere, eat elsewhere",
+   "verdict": "Keep",
+   "tone": "good"
+  }
+ ],
+ "budget": {
+  "headline": "At the low end this fits inside $7,000 — the Austrian version did not",
+  "alt": "Stacked budget bars. A low-fare scenario totals $6,450, under the $7,000 cap; typical December fares total $8,300.",
+  "cap": 7000,
+  "scale": 9000,
+  "scenarios": [
+   {
+    "label": "Flights at $800 each",
+    "total": 6450,
+    "items": [
+     {
+      "key": "flights",
+      "usd": 3200
+     },
+     {
+      "key": "hotels",
+      "usd": 1400
+     },
+     {
+      "key": "food",
+      "usd": 900
+     },
+     {
+      "key": "tickets",
+      "usd": 500
+     },
+     {
+      "key": "transport",
+      "usd": 450
+     }
+    ]
+   },
+   {
+    "label": "Typical December fares",
+    "total": 8300,
+    "items": [
+     {
+      "key": "flights",
+      "usd": 4400
+     },
+     {
+      "key": "hotels",
+      "usd": 1900
+     },
+     {
+      "key": "food",
+      "usd": 1050
+     },
+     {
+      "key": "tickets",
+      "usd": 500
+     },
+     {
+      "key": "transport",
+      "usd": 450
+     }
+    ]
+   }
+  ]
+ },
+ "planb": {
+  "steps": [
+   {
+    "tag": "Check",
+    "html": "Late November — has the <a href=\"https://www.valdesqui.es/\">Guadarrama season</a> opened? The resorts publish it."
+   },
+   {
+    "tag": "If yes",
+    "html": "Monday is the snow day. Book the ski school in advance; December weekends fill."
+   },
+   {
+    "tag": "If no",
+    "html": "Monday becomes the Prado and the Royal Palace, and Tuesday becomes a free day in Madrid."
+   },
+   {
+    "tag": "Either way",
+    "html": "Nothing else on the page moves. The snow day is deliberately isolated so losing it costs one day, not the trip."
+   }
+  ],
+  "swaps": [
+   {
+    "name_html": "Madrid — Retiro and the Crystal Palace",
+    "text": "A park day that works in 12 °C, which is most of December here.",
+    "photo": "cristal",
+    "alt": "The Palacio de Cristal in the Retiro."
+   },
+   {
+    "name_html": "Barcelona — the beach in winter",
+    "text": "Walkable from the Gothic Quarter and completely empty in December."
+   },
+   {
+    "name_html": "Friday 11 — do nothing",
+    "text": "Nothing is booked that day, so it absorbs a bad morning at no cost."
+   }
+  ]
+ },
+ "ground": [
+  {
+   "name": "Money",
+   "a_html": "Euro · cards work nearly everywhere",
+   "b": "Carry €100 for markets and the mountain"
+  },
+  {
+   "name": "Eating times",
+   "a_html": "Lunch 14:00, dinner from 21:00",
+   "b": "Kitchens often shut 16:00–20:00 — plan around it"
+  },
+  {
+   "name": "Daylight",
+   "a_html": "Sunset 17:49 in Madrid",
+   "b": "Nearly two hours later than central Europe"
+  },
+  {
+   "name": "Airport",
+   "a_html": "Metro or taxi from Barajas, 30–40 min",
+   "b": "Fixed taxi fare to the centre",
+   "check": true
+  },
+  {
+   "name": "The AVE",
+   "a_html": "<a href=\"https://www.renfe.com/es/en\">Book direct with Renfe</a>",
+   "b": "Under-14s are €5 on Avlo basic fares",
+   "check": true
+  },
+  {
+   "name": "The mountain",
+   "a_html": "No public transport worth using",
+   "b": "Hire a car or a transfer for the Monday",
+   "check": true
+  },
+  {
+   "name": "Markets",
+   "a_html": "Both are free to enter",
+   "b": "Madrid to 31 Dec · Barcelona to 23 Dec"
+  },
+  {
+   "name": "Tipping",
+   "a_html": "Not expected; round up if you like",
+   "b": "Nothing like 10% is required"
+  },
+  {
+   "name": "Emergency",
+   "a_html": "112 anywhere in the EU",
+   "b": "Works from any phone, in English",
+   "danger": true
+  }
+ ],
+ "bookings": [
+  {
+   "id": "flights",
+   "item": "Flights — Iberia IB356 out, BCN–MAD–SFO home, 4 people",
+   "date": "5 & 12 Dec"
+  },
+  {
+   "id": "madrid",
+   "item": "Madrid — room sleeping four, 3 nights",
+   "date": "6–9 Dec"
+  },
+  {
+   "id": "barcelona",
+   "item": "Barcelona — family room sleeping four, 3 nights",
+   "date": "9–12 Dec"
+  },
+  {
+   "id": "ave",
+   "item": "AVE Madrid → Barcelona, 2 adults + 2 children",
+   "date": "9 Dec"
+  },
+  {
+   "id": "sagrada",
+   "item": "Sagrada Família — booked time slot, direct only",
+   "date": "10 Dec"
+  },
+  {
+   "id": "guell",
+   "item": "Park Güell — time slot before 15:00",
+   "date": "10 Dec"
+  },
+  {
+   "id": "prado",
+   "item": "Prado — free timed tickets for the boys",
+   "date": "8 Dec"
+  },
+  {
+   "id": "palace",
+   "item": "Royal Palace",
+   "date": "8 Dec"
+  },
+  {
+   "id": "snow",
+   "item": "Snow day — lift passes and ski school, only once the season opens",
+   "date": "7 Dec"
+  },
+  {
+   "id": "car",
+   "item": "Car or transfer for the mountain",
+   "date": "7 Dec"
+  },
+  {
+   "id": "etias",
+   "item": "ETIAS — only if it has launched",
+   "date": "before 1 Dec"
+  },
+  {
+   "id": "insurance",
+   "item": "Travel insurance",
+   "date": "before 1 Dec"
+  }
+ ],
+ "addresses": [
+  {
+   "place_html": "Museo del Prado",
+   "address": "Calle de Ruiz de Alarcón 23, 28014 Madrid",
+   "phone": "+34 913 30 28 00"
+  },
+  {
+   "place_html": "Palacio Real",
+   "address": "Calle de Bailén s/n, 28071 Madrid"
+  },
+  {
+   "place_html": "Plaza Mayor",
+   "address": "Plaza Mayor, 28012 Madrid"
+  },
+  {
+   "place_html": "Madrid Atocha station",
+   "address": "Plaza del Emperador Carlos V, 28045 Madrid"
+  },
+  {
+   "place_html": "Valdesquí",
+   "address": "Puerto de Cotos, 28740 Rascafría, Madrid"
+  },
+  {
+   "place_html": "Sagrada Família",
+   "address": "Carrer de Mallorca 401, 08013 Barcelona"
+  },
+  {
+   "place_html": "Park Güell",
+   "address": "Carrer d'Olot s/n, 08024 Barcelona"
+  },
+  {
+   "place_html": "Barcelona Sants station",
+   "address": "Plaça dels Països Catalans s/n, 08014 Barcelona"
+  },
+  {
+   "place_html": "Fira de Santa Llúcia",
+   "address": "Avinguda de la Catedral, 08002 Barcelona"
+  },
+  {
+   "place_html": "<strong>Any emergency, EU-wide</strong>",
+   "address": "Police 091 · Ambulance 061 (Spain)",
+   "phone": "112"
+  }
+ ],
+ "sources": [
+  {
+   "label": "Facts",
+   "html": "<a href=\"https://thepointsguy.com/guide/europe-travel-visa-etias-what-to-know\">ETIAS status</a> · <a href=\"https://www.museodelprado.es/en/visit-the-museum\">Prado hours and prices</a> · <a href=\"https://parkguell.barcelona/en/planning-your-visit/prices-and-times\">Park Güell winter hours</a> · <a href=\"https://www.esmadrid.com/en/whats-on/plaza-mayor-christmas-market\">Plaza Mayor market</a> · <a href=\"https://irbarcelona.org/christmas-barcelona/fira-santa-llucia-market/\">Fira de Santa Llúcia</a> · <a href=\"https://www.renfe.com/es/en\">Renfe AVE</a> · <a href=\"https://www.valdesqui.es/\">Valdesquí</a>"
+  },
+  {
+   "label": "Weather and daylight",
+   "html": "<a href=\"https://weather-and-climate.com/Madrid-December-averages\">Madrid averages</a> · <a href=\"https://weather-and-climate.com/barcelona-December-averages\">Barcelona averages</a> · <a href=\"https://sunrise-sunset.org/es/madrid\">Madrid daylight</a>"
+  },
+  {
+   "label": "Flights",
+   "html": "<a href=\"https://www.iberia.com/\">Iberia</a> · <a href=\"https://www.google.com/travel/flights/flights-from-san-francisco-to-madrid.html?gl=US&amp;hl=en-US\">SFO–Madrid fares</a> · <a href=\"https://www.google.com/travel/flights/flights-from-barcelona-to-san-francisco.html?gl=US&amp;hl=en-US\">Barcelona–SFO fares</a>"
+  }
+ ]
+}

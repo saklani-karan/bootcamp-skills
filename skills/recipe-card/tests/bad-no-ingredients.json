@@ -1,0 +1,28 @@
+{
+ "id": "test-cards",
+ "title": "Test cards",
+ "units": "source",
+ "cards": [
+  {
+   "id": "pancakes",
+   "title": "Pancakes",
+   "serves": 4,
+   "serves_text": "Serves 4",
+   "ingredients": [
+    {
+     "name": "",
+     "items": []
+    }
+   ],
+   "method": [
+    {
+     "name": "",
+     "steps": [
+      "Whisk everything.",
+      "Cook in a hot pan."
+     ]
+    }
+   ]
+  }
+ ]
+}

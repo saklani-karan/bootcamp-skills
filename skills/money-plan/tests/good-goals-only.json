@@ -1,0 +1,20 @@
+{
+ "id": "test-plan",
+ "title": "Test plan",
+ "start": "2026-11",
+ "monthly_amount": 1500,
+ "look": {
+  "font": "rounded",
+  "bg": "auto"
+ },
+ "debts": [],
+ "goals": [
+  {
+   "name": "Rainy day",
+   "target": 5000,
+   "saved": 1000,
+   "by": "2028-06",
+   "return": 3.0
+  }
+ ]
+}

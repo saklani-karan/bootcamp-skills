@@ -1,0 +1,86 @@
+{
+ "id": "guard-test",
+ "title": "Guard test",
+ "age": 10,
+ "count": 3,
+ "level": 2,
+ "sections": [
+  "A"
+ ],
+ "photos": [
+  {
+   "key": "p1",
+   "label": "x"
+  }
+ ],
+ "questions": [
+  {
+   "id": "q0",
+   "section": "A",
+   "lvl": 2,
+   "t": "mc",
+   "q": "Question 0?",
+   "opts": [
+    "Right",
+    "Wrong one",
+    "Wrong two",
+    "Wrong three"
+   ],
+   "a": 0,
+   "h": "a nudge",
+   "f": "a fact",
+   "check": true
+  },
+  {
+   "id": "q0",
+   "section": "A",
+   "lvl": 2,
+   "t": "mc",
+   "q": "Question 1?",
+   "opts": [
+    "Right",
+    "Wrong one",
+    "Wrong two",
+    "Wrong three"
+   ],
+   "a": 0,
+   "h": "a nudge",
+   "f": "a fact",
+   "check": true
+  },
+  {
+   "id": "q2",
+   "section": "A",
+   "lvl": 2,
+   "t": "mc",
+   "q": "Question 2?",
+   "opts": [
+    "Right",
+    "Wrong one",
+    "Wrong two",
+    "Wrong three"
+   ],
+   "a": 0,
+   "h": "a nudge",
+   "f": "a fact",
+   "check": true
+  },
+  {
+   "id": "q3",
+   "section": "A",
+   "lvl": 2,
+   "t": "mc",
+   "q": "Question 3?",
+   "opts": [
+    "Right",
+    "Wrong one",
+    "Wrong two",
+    "Wrong three"
+   ],
+   "a": 0,
+   "h": "a nudge",
+   "f": "a fact",
+   "check": true
+  }
+ ]
+}

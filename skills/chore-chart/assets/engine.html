@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+/* Chore chart engine. One file, no network, no model. The chart lives in CHART
+   below; build_chart.py decides every assignment and fair share. Do not edit per family. */
+:root{
+  --ground:#EAF2F8; --surface:#FFFFFF; --ink:#13233A; --soft:#4A5B70; --lines:#C9D6E2;
+  --accent:#1F5FBF; --on-accent:#FFFFFF; --good:#1E7B4A; --good-bg:#DDF3E6;
+  --hl:#D6E6FB; --shadow:rgba(19,35,58,.18);
+  --font: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Nunito", "Varela Round", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:16px; color-scheme: light;
+}
+:root[data-bg="pine"]{ --ground:#E4F0E8; --ink:#14301F; --soft:#47604F; --lines:#C3D8CA; --accent:#1F6B45; --hl:#CFE6D8; }
+:root[data-bg="sunset"]{ --ground:#FCEDE2; --ink:#3A1E10; --soft:#6D4C3B; --lines:#EBCDB8; --accent:#C2410C; --hl:#F8D9C4; }
+:root[data-bg="berry"]{ --ground:#F3E8F6; --ink:#2E1534; --soft:#654A6B; --lines:#DCC6E2; --accent:#8A2B8F; --hl:#EBD3F0; }
+:root[data-bg="sky"]{ --ground:#E3F4FB; --ink:#0F2A36; --soft:#43626F; --lines:#BFDDEA; --accent:#0B7A9C; --hl:#C9E8F4; }
+:root[data-bg="night"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A;
+  --hl:#2A4A78; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-bg="auto"]:not([data-theme="light"]){
+    --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+    --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A;
+    --hl:#2A4A78; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+  }
+}
+:root[data-bg="auto"][data-theme="dark"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A;
+  --hl:#2A4A78; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+/* local fonts only, so the file works offline and inside any sandbox */
+:root[data-font="story"]{ --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
+:root[data-font="clear"]{ --font: Verdana, "Atkinson Hyperlegible", Tahoma, "DejaVu Sans", sans-serif; }
+:root[data-font="hand"]{ --font: "Chalkboard SE", "Comic Sans MS", "Comic Neue", "Marker Felt", cursive; }
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:clamp(14px,3vw,28px) clamp(12px,3vw,28px) 40px}
+h1{margin:0;font-size:clamp(26px,5vw,38px);line-height:1.1;overflow-wrap:anywhere}
+.sub{margin:6px 0 0;color:var(--soft)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.kids{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.kid{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;background:var(--surface);border:2px solid var(--lines);min-width:0}
+.kid i{width:14px;height:14px;border-radius:50%;flex:0 0 auto}
+.kid b{overflow-wrap:anywhere}
+.kid small{color:var(--soft)}
+nav{position:sticky;top:0;z-index:4;display:flex;flex-wrap:wrap;gap:6px;padding:8px 0;background:var(--ground)}
+nav button{flex:0 0 auto;padding:8px 14px;border-radius:999px;border:2px solid var(--lines);background:var(--surface);font-weight:700;font-size:15px}
+nav button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+section.panel{display:none;margin-top:8px}
+section.panel.on{display:block}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin:6px 0 10px}
+.head h2{margin:0;font-size:24px}
+.head span{display:flex;flex-wrap:wrap;gap:6px}
+.tool{white-space:nowrap;padding:7px 12px;border-radius:10px;border:2px solid var(--lines);background:var(--surface);font-weight:700;font-size:14px}
+.ptitle{display:none}
+.progress{color:var(--soft);font-weight:700;margin:0 0 8px}
+/* the week grid: a row per child, a column per day */
+.grid{display:grid;grid-template-columns:minmax(96px,.9fr) repeat(var(--nd),minmax(0,1fr));border:2px solid var(--lines);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.gh{padding:8px 6px;font-weight:800;text-align:center;background:var(--hl);border-bottom:2px solid var(--lines)}
+.gh small{display:block;font-weight:600;color:var(--soft);font-size:12px}
+.gh.corner{background:var(--hl)}
+.name{padding:10px 10px 10px 12px;border-top:2px solid var(--lines);border-left:8px solid var(--kc);font-weight:800;font-size:18px;overflow-wrap:anywhere;background:var(--surface)}
+.name small{display:block;font-weight:600;font-size:12px;color:var(--soft)}
+.cell{padding:6px 4px;border-top:2px solid var(--lines);border-left:1px solid var(--lines);display:flex;flex-direction:column;gap:4px;min-width:0}
+.dl{display:none}
+.item{display:flex;align-items:flex-start;gap:6px;padding:4px;border-radius:8px;font-size:13.5px;line-height:1.25;min-width:0;width:100%}
+.item:hover{background:var(--hl)}
+.box{flex:0 0 auto;width:24px;height:24px;border-radius:7px;border:2.5px solid var(--kc);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:transparent;background:var(--surface)}
+.item .t{overflow-wrap:anywhere;min-width:0}
+.item.done .box{background:var(--kc);color:#fff}
+.item.done .t{text-decoration:line-through;opacity:.65}
+.fair{margin:10px 0 0;padding:10px 14px;border-radius:12px;background:var(--hl);font-size:14.5px}
+.fair b{white-space:nowrap}
+.card{background:var(--surface);border:2px solid var(--lines);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;min-width:0;overflow-x:auto}
+.muted{color:var(--soft)}
+table{width:100%;border-collapse:collapse}
+td,th{padding:7px 6px;border-bottom:1px solid var(--lines);text-align:left;vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+td.n,th.n{text-align:right;white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:5px;font-weight:700;white-space:nowrap}
+.chip i{width:10px;height:10px;border-radius:50%}
+.dd{position:relative;display:inline-block}
+.pop{position:absolute;right:0;top:calc(100% + 6px);z-index:6;display:none;flex-direction:column;gap:6px;padding:10px;min-width:220px;background:var(--surface);border:2px solid var(--lines);border-radius:14px;box-shadow:0 10px 24px var(--shadow)}
+.pop.open{display:flex}
+.pop h4{margin:2px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft)}
+.sw{display:flex;flex-wrap:wrap;gap:6px}
+.sw button{padding:5px 10px;border-radius:10px;background:var(--ground);border:2px solid transparent;font-size:14px}
+.sw button.on{border-color:var(--accent)}
+footer{margin-top:24px;color:var(--soft);font-size:13px}
+@media (max-width:640px){
+  /* on a phone the grid becomes one block per child, a line per day */
+  .grid{display:block;border-radius:14px}
+  .gh{display:none}
+  .name{border-top:0;border-left:0;border-bottom:4px solid var(--kc);background:var(--hl);font-size:19px}
+  .cell{position:relative;gap:2px;border-left:0;border-top:1px solid var(--lines);padding:6px 8px 6px 54px}
+  .cell.empty{display:none}
+  .dl{display:block;position:absolute;left:10px;top:12px;font-weight:800;color:var(--soft)}
+  .item{font-size:15px}
+  .box{width:28px;height:28px}
+}
+@media print{
+  :root{--ground:#fff!important;--surface:#fff!important;--ink:#000!important;--soft:#222!important;--accent:#000!important;--lines:#000!important;--hl:#fff!important;color-scheme:light}
+  @page{size:landscape;margin:9mm}
+  body{font-size:11pt;background:#fff}
+  .wrap{padding:0;max-width:none}
+  .top,.kids,nav,.tool,.dd,.progress,footer{display:none!important}
+  section.panel{display:none!important;margin:0}
+  body.print-week section.week.on,body.print-all section.week,body.print-rota #rota{display:block!important}
+  body:not([class*="print-"]) section.week{display:block!important}
+  section.week{break-after:page}
+  section.week.lastp{break-after:auto}
+  .head{display:none}
+  .ptitle{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 3mm}
+  .ptitle h2{margin:0;font-size:18pt}
+  .ptitle span{font-size:11pt;font-weight:700}
+  #rota .head{display:flex} #rota .head h2{font-size:16pt}
+  .grid{border:1.5px solid #000;border-radius:0;grid-template-columns:36mm repeat(var(--nd),minmax(0,1fr))}
+  .gh{border-bottom:1.5px solid #000;font-size:12pt;padding:2mm 1mm}
+  .gh small{font-size:9pt;color:#000}
+  .name{border-left:0;border-top:1.5px solid #000;font-size:14pt;padding:2mm;overflow-wrap:normal;word-break:normal}
+  .name small{font-size:8.5pt}
+  .cell{border-top:1.5px solid #000;border-left:1px solid #000;padding:1.5mm 1mm;gap:1.4mm}
+  .item{font-size:10pt;padding:0;gap:1.6mm;line-height:1.15}
+  .box{width:7mm;height:7mm;border:1.6pt solid #000!important;border-radius:1.2mm;background:#fff!important;color:transparent!important}
+  .item.done .t{text-decoration:none;opacity:1}
+  section.week{zoom:var(--pz,1)}   /* set per week from its busiest rows, so a big family still fits one page */
+  .fair{background:#fff;border:1px solid #000;border-radius:2mm;padding:1.5mm 3mm;margin-top:3mm;font-size:9pt}
+  .card{border:1px solid #000;padding:2mm 3mm;overflow:visible}
+  td,th{padding:1.2mm 1.5mm;border-bottom:1px solid #000;font-size:9.5pt}
+  .chip i{display:none}
+  #rota td,#rota th{padding:.7mm 1.5mm;font-size:8.5pt;line-height:1.2} #rota h3{margin:2mm 0 1mm;font-size:12pt} #rota .card{margin-bottom:2mm} #rota p.muted{font-size:8.5pt;margin-top:2mm!important}
+  .name,.cell,tr{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1 id="title"></h1><p class="sub" id="sub"></p></div>
+    <div class="dd"><button class="tool" data-pop="look">Look ▾</button>
+      <div class="pop" id="pop-look"><h4>Colour</h4><div class="sw" id="sw-bg"></div><h4>Letters</h4><div class="sw" id="sw-font"></div></div></div>
+  </div>
+  <div class="kids" id="kids"></div>
+  <nav id="nav" aria-label="Weeks"></nav>
+  <div id="panels"></div>
+  <footer><span id="built"></span> <span>· Ticks are kept in this browser on this device.</span></footer>
+</div>
+
+<script>
+var CHART = /*__CHART__*/null;
+(function(){
+"use strict";
+var C = CHART, root = document.documentElement, $ = function(id){ return document.getElementById(id); };
+var COLOURS = [["auto","Auto"],["snow","Snow"],["sky","Sky"],["pine","Pine"],["sunset","Sunset"],["berry","Berry"],["night","Night"]];
+var FONTS = [["rounded","Rounded"],["clear","Easy to read"],["story","Storybook"],["hand","Handwriting"]];
+var TABS = C.weeks.map(function(w){ return ["w" + w.n, "Week " + w.n]; }).concat([["rota", "Who does what"]]);
+var KEY = "chores:" + C.id;
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+var S = load() || {}; S.ticks = S.ticks || {}; S.look = S.look || { bg: C.look.bg, font: C.look.font }; S.tab = S.tab || "w1";
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function pts(x){ return (Math.round(x * 10) / 10).toString(); }
+function chip(i){ var k = C.children[i]; return '<span class="chip"><i style="background:' + k.colour + '"></i>' + esc(k.name) + '</span>'; }
+
+/* ---------- header ---------- */
+$("title").textContent = C.title; $("sub").textContent = C.subtitle;
+$("kids").innerHTML = C.children.map(function(k){
+  return '<div class="kid"><i style="background:' + k.colour + '"></i><b>' + esc(k.name) + '</b><small>' + k.age + ' · fair share ' + pts(k.share) + ' pts a week</small></div>'; }).join("");
+$("built").textContent = "Worked out " + C.builtOn + ". Points = how hard a chore is (1–5) × how many times that week.";
+$("nav").innerHTML = TABS.map(function(t){ return '<button data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join("");
+
+/* Print fit: estimate each week's printed height (in mm, on the smaller of A4 and Letter
+   landscape) from how its chore names wrap, and shrink that week until it fits one page. */
+function wrapLines(text, perLine){ var n = 1, len = 0; text.split(" ").forEach(function(wd){
+  if (len && len + 1 + wd.length > perLine){ n++; len = wd.length; } else len += (len ? 1 : 0) + wd.length; }); return n; }
+function printHeight(w, z){
+  var colW = (261 / z - 36) / C.days.length, per = Math.max(4, (colW - 11) / 1.94), h = 10 + 14 + 12;
+  w.grid.forEach(function(row){ var r = 12; row.forEach(function(cell){ var ch = 3;
+    cell.forEach(function(k){ ch += Math.max(7, wrapLines(C.chores[k].title, per) * 4.1) + 1.4; }); r = Math.max(r, ch); }); h += r; });
+  return h * z;
+}
+function printZoom(w){ var z = 1; while (z > 0.35 && printHeight(w, z) > 182) z -= 0.02; return Math.round(z * 100) / 100; }
+var dense = "";
+
+/* ---------- the weeks ---------- */
+var panels = "";
+C.weeks.forEach(function(w, wi){
+  panels += '<section class="panel week' + (wi === C.weeks.length - 1 ? ' lastp' : '') + '" id="w' + w.n + '"></section>';
+});
+panels += '<section class="panel" id="rota"></section>';
+$("panels").innerHTML = panels;
+
+function key(w, c, d, k){ return w + "|" + c + "|" + d + "|" + k; }
+function drawWeek(w){
+  var nd = C.days.length, h = '', done = 0;
+  h += '<div class="ptitle"><h2>' + esc(C.title) + '</h2><span>' + esc(w.label) + '</span></div>';
+  h += '<div class="head"><h2>' + esc(w.label) + '</h2><span><button class="tool" data-print="week">Print this week</button><button class="tool" data-print="all">Print all weeks</button></span></div>';
+  w.grid.forEach(function(row, c){ row.forEach(function(cell, d){ cell.forEach(function(k){ if (S.ticks[key(w.n, c, d, k)]) done++; }); }); });
+  h += '<p class="progress">' + done + ' of ' + w.ticks + ' ticked this week</p>';
+  h += '<div class="grid" style="--nd:' + nd + '"><div class="gh corner"></div>' +
+    C.days.map(function(d, i){ return '<div class="gh">' + d + (w.dates ? '<small>' + esc(w.dates[i]) + '</small>' : '') + '</div>'; }).join("");
+  w.grid.forEach(function(row, c){
+    var k = C.children[c];
+    h += '<div class="name" style="--kc:' + k.colour + '">' + esc(k.name) + '<small>' + w.loads[c] + ' pts</small></div>';
+    row.forEach(function(cell, d){
+      h += '<div class="cell' + (cell.length ? '' : ' empty') + '" style="--kc:' + k.colour + '"><span class="dl">' + C.days[d] + '</span>' +
+        cell.map(function(ki){
+          var id = key(w.n, c, d, ki), on = !!S.ticks[id], ch = C.chores[ki];
+          return '<button class="item' + (on ? ' done' : '') + '" data-tick="' + id + '" aria-pressed="' + on + '"><span class="box">✓</span><span class="t">' + esc(ch.title) + '</span></button>';
+        }).join("") + '</div>';
+    });
+  });
+  h += '</div>';
+  h += '<p class="fair"><b>Fair share this week:</b> ' + C.children.map(function(k, c){
+    return '<b>' + esc(k.name) + '</b> ' + w.loads[c] + ' pts (fair ' + pts(k.share) + ')'; }).join(" · ") + '</p>';
+  $("w" + w.n).innerHTML = h; $("w" + w.n).style.setProperty("--pz", w.pz || (w.pz = printZoom(w)));
+}
+C.weeks.forEach(drawWeek);
+
+/* ---------- who does what, and why it is fair ---------- */
+(function(){
+  var F = C.fair, h = '<div class="head"><h2>Who does what</h2><span><button class="tool" data-print="rota">Print this</button></span></div>';
+  h += '<div class="card"><table><tr><th>Chore</th><th>How often</th>' + C.weeks.map(function(w){ return '<th>Wk ' + w.n + '</th>'; }).join("") + '</tr>' +
+    C.chores.map(function(ch, k){
+      return '<tr data-chore="' + esc(ch.id) + '"><td>' + esc(ch.title) + (ch.note ? '<br><small class="muted">' + esc(ch.note) + '</small>' : '') +
+        (ch.same ? '<br><small class="muted">only one child can do this one, so it stays with them</small>' : '') + '</td><td>' + esc(ch.how) + ' · ' + ch.points + (ch.points === 1 ? ' pt' : ' pts') + '</td>' +
+        C.weeks.map(function(w){ return '<td>' + chip(w.owner[k]) + '</td>'; }).join("") + '</tr>'; }).join("") + '</table></div>';
+  h += '<h3>Points each week</h3><div class="card"><table><tr><th>Child</th><th class="n">Age</th><th class="n">Fair share</th>' +
+    C.weeks.map(function(w){ return '<th class="n">Wk ' + w.n + '</th>'; }).join("") + '<th class="n">Average</th></tr>' +
+    C.children.map(function(k, c){
+      return '<tr><td>' + chip(c) + (k.why ? '<br><small class="muted">' + esc(k.why) + '</small>' : '') + '</td><td class="n">' + k.age + '</td><td class="n">' + pts(k.share) + '</td>' +
+        C.weeks.map(function(w){ return '<td class="n">' + w.loads[c] + '</td>'; }).join("") + '<td class="n">' + pts(k.avg) + '</td></tr>'; }).join("") + '</table>' +
+    '<p class="muted" style="margin:10px 0 0">A chore\'s points are how hard it is (1–5) times how many times it happens that week. ' +
+    'Each child\'s fair share is the week\'s ' + F.total + ' points split by age (age − 2, at least 2 and at most 12), and a younger child is never given more than the chores they are old enough for. ' +
+    'Nobody has the same chore two weeks running when someone else can do it. Every week, everyone is within ' + pts(F.week_dev) + ' points of their fair share, and over the whole chart within ' + pts(F.period_dev) + ' a week.</p></div>';
+  $("rota").innerHTML = h;
+})();
+
+/* ---------- look, tabs, printing ---------- */
+function swatches(){
+  $("sw-bg").innerHTML = COLOURS.map(function(o){ return '<button data-bg="' + o[0] + '"' + (S.look.bg === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+  $("sw-font").innerHTML = FONTS.map(function(o){ return '<button data-font="' + o[0] + '"' + (S.look.font === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+}
+function applyLook(){ root.setAttribute("data-bg", S.look.bg); root.setAttribute("data-font", S.look.font); swatches(); }
+function tab(t){
+  S.tab = t; save();
+  TABS.forEach(function(x){ $(x[0]).classList.toggle("on", x[0] === t); });
+  var b = document.querySelectorAll("#nav button"); for (var i = 0; i < b.length; i++) b[i].classList.toggle("on", b[i].getAttribute("data-tab") === t);
+}
+function weekOf(id){ var n = +id.split("|")[0]; for (var i = 0; i < C.weeks.length; i++) if (C.weeks[i].n === n) return C.weeks[i]; return null; }
+window.addEventListener("afterprint", function(){ document.body.className = dense; });
+
+document.addEventListener("click", function(ev){
+  var el = ev.target;
+  while (el && el !== document && el !== root && !(el.getAttribute && (el.hasAttribute("data-tab") || el.hasAttribute("data-tick") || el.hasAttribute("data-print") || el.hasAttribute("data-pop") || el.hasAttribute("data-bg") || el.hasAttribute("data-font")))) el = el.parentNode;
+  /* <html> carries data-font/data-bg for the look: the walk stops there, and a tap that reaches it is a tap on nothing */
+  var pop = $("pop-look");
+  if (!el || el === document || el === root){ pop.classList.remove("open"); return; }
+  var a = function(n){ return el.getAttribute(n); };
+  if (el.hasAttribute("data-pop")){ pop.classList.toggle("open"); return; }
+  if (el.hasAttribute("data-bg")){ S.look.bg = a("data-bg"); save(); applyLook(); return; }
+  if (el.hasAttribute("data-font")){ S.look.font = a("data-font"); save(); applyLook(); return; }
+  pop.classList.remove("open");
+  if (el.hasAttribute("data-tab")){ tab(a("data-tab")); return; }
+  if (el.hasAttribute("data-tick")){ var id = a("data-tick"); if (S.ticks[id]) delete S.ticks[id]; else S.ticks[id] = 1; save(); drawWeek(weekOf(id)); return; }
+  if (el.hasAttribute("data-print")){ document.body.className = (dense ? dense + " " : "") + "print-" + a("data-print"); window.print(); }
+});
+
+document.body.className = (document.body.className + " " + dense).trim();
+var want = location.hash.slice(1) || S.tab;   // a link ending #w2 opens week 2
+applyLook(); tab(TABS.some(function(t){ return t[0] === want; }) ? want : "w1");
+setTimeout(function(){ window.scrollTo(0, 0); }, 0);
+window.__chart = { state: function(){ return S; }, zoom: C.weeks.map(function(w){ return w.pz; }) };
+})();
+</script>
+</body>
+</html>

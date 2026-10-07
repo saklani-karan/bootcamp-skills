@@ -1,0 +1,86 @@
+{
+ "id": "test-flat",
+ "title": "Test flat upkeep",
+ "builtOn": "7 October 2026",
+ "example": true,
+ "region": "Melbourne, Australia",
+ "hemisphere": "south",
+ "words": "uk",
+ "home": {
+  "type": "apartment",
+  "tenure": "rent"
+ },
+ "features": [
+  "smoke_alarms",
+  "ac",
+  "water_heater",
+  "dishwasher",
+  "washing_machine",
+  "range_hood",
+  "deck",
+  "yard",
+  "car"
+ ],
+ "start": "2026-09",
+ "jobs": [
+  {
+   "id": "smoke-alarm-test",
+   "last_done": "2026-10-07"
+  },
+  {
+   "id": "alarm-batteries",
+   "last_done": "2026-02"
+  },
+  {
+   "id": "hvac-filter",
+   "every": 1
+  },
+  {
+   "id": "ac-service"
+  },
+  {
+   "id": "water-heater-flush"
+  },
+  {
+   "id": "draft-check"
+  },
+  {
+   "id": "deck-check",
+   "last_done": "2026-04-11"
+  },
+  {
+   "id": "tire-pressure"
+  },
+  {
+   "id": "leak-check"
+  },
+  {
+   "id": "dishwasher-filter"
+  },
+  {
+   "id": "yard-spring",
+   "last_done": "2026-09-12"
+  }
+ ],
+ "custom": [
+  {
+   "title": "Descale the kettle",
+   "every": 3,
+   "who": "diy",
+   "minutes": 15,
+   "why": "Limescale clogs the element; use citric acid, not vinegar. Note from the drawer: C:\\kettle\\manual — “descale” means rinse twice."
+  },
+  {
+   "title": "Check the bond paperwork",
+   "every": 60,
+   "last_done": "2024-01-15",
+   "who": "diy",
+   "minutes": 20,
+   "why": "Keep the condition report and photos together for moving out."
+  }
+ ],
+ "look": {
+  "font": "clear",
+  "bg": "pine"
+ }
+}

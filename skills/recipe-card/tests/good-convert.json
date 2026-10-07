@@ -1,0 +1,54 @@
+{
+ "id": "test-cards",
+ "title": "Test cards",
+ "units": "us",
+ "cards": [
+  {
+   "id": "pancakes",
+   "title": "Pancakes",
+   "serves": 4,
+   "serves_text": "Serves 4",
+   "ingredients": [
+    {
+     "name": "",
+     "items": [
+      {
+       "text": "1 1/2 cups flour",
+       "qty": "1 1/2",
+       "unit": "cups",
+       "item": "flour"
+      },
+      {
+       "text": "2 eggs",
+       "qty": "2",
+       "unit": "",
+       "item": "eggs"
+      },
+      {
+       "text": "250 ml milk",
+       "qty": "250",
+       "unit": "ml",
+       "item": "milk"
+      },
+      {
+       "text": "a pinch of salt",
+       "qty": "",
+       "unit": "",
+       "item": "salt"
+      }
+     ]
+    }
+   ],
+   "method": [
+    {
+     "name": "",
+     "steps": [
+      "Whisk everything.",
+      "Cook in a hot pan."
+     ]
+    }
+   ],
+   "scale_to": 6
+  }
+ ]
+}

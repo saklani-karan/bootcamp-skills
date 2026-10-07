@@ -1,0 +1,40 @@
+{
+ "id": "test-plan",
+ "title": "Test plan",
+ "start": "2026-11",
+ "monthly_amount": 1500,
+ "look": {
+  "font": "rounded",
+  "bg": "auto"
+ },
+ "debts": [
+  {
+   "name": "Card A",
+   "balance": 3000,
+   "apr": 22.0,
+   "minimum": 90
+  },
+  {
+   "name": "Card B",
+   "balance": 0,
+   "apr": 18.0,
+   "minimum": 40
+  },
+  {
+   "name": "Car",
+   "balance": 9000,
+   "apr": 6.0,
+   "minimum": 250
+  }
+ ],
+ "extra": 300,
+ "goals": [
+  {
+   "name": "Rainy day",
+   "target": 5000,
+   "saved": 1000,
+   "by": "2028-06",
+   "return": 3.0
+  }
+ ]
+}

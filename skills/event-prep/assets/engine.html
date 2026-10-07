@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+/* Event plan engine. One file, no network, no model. The plan lives in EVENT
+   below; build_event.py works out every amount and total. Do not edit per event. */
+:root{
+  --ground:#EAF2F8; --surface:#FFFFFF; --ink:#13233A; --soft:#4A5B70; --lines:#C9D6E2;
+  --accent:#1F5FBF; --on-accent:#FFFFFF; --good:#1E7B4A; --good-bg:#DDF3E6; --bad:#9A5B00; --bad-bg:#FDF0D9;
+  --hl:#D6E6FB; --shadow:rgba(19,35,58,.18);
+  --font: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Nunito", "Varela Round", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:16px; color-scheme: light;
+}
+:root[data-bg="pine"]{ --ground:#E4F0E8; --ink:#14301F; --soft:#47604F; --lines:#C3D8CA; --accent:#1F6B45; --hl:#CFE6D8; }
+:root[data-bg="sunset"]{ --ground:#FCEDE2; --ink:#3A1E10; --soft:#6D4C3B; --lines:#EBCDB8; --accent:#C2410C; --hl:#F8D9C4; }
+:root[data-bg="berry"]{ --ground:#F3E8F6; --ink:#2E1534; --soft:#654A6B; --lines:#DCC6E2; --accent:#8A2B8F; --hl:#EBD3F0; }
+:root[data-bg="sky"]{ --ground:#E3F4FB; --ink:#0F2A36; --soft:#43626F; --lines:#BFDDEA; --accent:#0B7A9C; --hl:#C9E8F4; }
+:root[data-bg="night"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2B35E; --bad-bg:#3A2A12;
+  --hl:#2A4A78; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-bg="auto"]:not([data-theme="light"]){
+    --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+    --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2B35E; --bad-bg:#3A2A12;
+    --hl:#2A4A78; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+  }
+}
+:root[data-bg="auto"][data-theme="dark"]{
+  --ground:#0E1828; --surface:#172539; --ink:#EAF1FA; --soft:#A9B9CC; --lines:#2B3D55;
+  --accent:#78A9FF; --on-accent:#0E1828; --good:#5FD39A; --good-bg:#16382A; --bad:#F2B35E; --bad-bg:#3A2A12;
+  --hl:#2A4A78; --shadow:rgba(0,0,0,.5); color-scheme: dark;
+}
+/* local fonts only, so the file works offline and inside any sandbox */
+:root[data-font="story"]{ --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
+:root[data-font="clear"]{ --font: Verdana, "Atkinson Hyperlegible", Tahoma, "DejaVu Sans", sans-serif; }
+:root[data-font="hand"]{ --font: "Chalkboard SE", "Comic Sans MS", "Comic Neue", "Marker Felt", cursive; }
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding:clamp(14px,3vw,28px) clamp(12px,3vw,28px) 40px}
+h1{margin:0;font-size:clamp(26px,5vw,38px);line-height:1.1;overflow-wrap:anywhere}
+.sub{margin:6px 0 0;color:var(--soft)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px;margin:16px 0}
+.fact{background:var(--surface);border:2px solid var(--lines);border-radius:14px;padding:10px 12px;min-width:0}
+.fact b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.fact span{font-weight:800;font-size:17px;overflow-wrap:anywhere}
+.fact small{display:block;color:var(--soft)}
+nav{position:sticky;top:0;z-index:4;display:flex;gap:6px;overflow-x:auto;padding:8px 0;background:var(--ground);scrollbar-width:none}
+@media (max-width:600px){nav{flex-wrap:wrap;overflow-x:visible}} /* a hidden scrollbar hides tabs from a first-time user */
+nav button{flex:0 0 auto;padding:8px 14px;border-radius:999px;border:2px solid var(--lines);background:var(--surface);font-weight:700;font-size:15px}
+nav button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+section.panel{display:none;margin-top:10px}
+section.panel.on{display:block}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin:6px 0 12px}
+.head h2{margin:0;font-size:24px}
+.tool{white-space:nowrap;padding:7px 12px;border-radius:10px;border:2px solid var(--lines);background:var(--surface);font-weight:700;font-size:14px}
+.card{background:var(--surface);border:2px solid var(--lines);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;min-width:0}
+.muted{color:var(--soft)}
+.day{margin:16px 0 6px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);font-weight:800}
+.meal{display:grid;grid-template-columns:minmax(0,92px) minmax(0,1fr);gap:12px}
+.meal .t{font-weight:800}
+.meal h3{margin:0 0 4px;font-size:18px}
+.meal ul{margin:0;padding-left:18px}
+.tag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--good-bg);color:var(--good);font-size:12px;font-weight:800;vertical-align:1px}
+.note{margin:12px 0;padding:12px 14px;border-radius:12px;background:var(--hl)}
+.warnbox{margin:10px 0;padding:10px 14px;border-radius:12px;background:var(--bad-bg);color:var(--ink);border-left:5px solid var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chips button{padding:7px 12px;border-radius:999px;border:2px solid var(--lines);background:var(--surface);font-weight:700;font-size:14px}
+.chips button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.store{margin:14px 0 6px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;align-items:baseline}
+.store h3{margin:0;font-size:19px}
+.store small{color:var(--soft)}
+.sect{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--soft);font-weight:800;margin:10px 0 4px}
+.line{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px 12px;border-radius:12px;background:var(--surface);border:2px solid var(--lines);margin-bottom:6px}
+.line .tick{width:34px;height:34px;border-radius:10px;border:2px solid var(--lines);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:transparent;background:var(--ground)}
+.line.done{opacity:.6}
+.line.done .tick{background:var(--good);border-color:var(--good);color:#fff}
+.line.done .what{text-decoration:line-through}
+.what{font-weight:800;overflow-wrap:anywhere}
+.buy{font-weight:700}
+.why{font-size:13px;color:var(--soft)}
+.flag{font-size:13px;color:var(--bad);font-weight:700}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bad);margin-left:6px;vertical-align:1px}
+.cost{font-weight:800;white-space:nowrap;text-align:right}
+.total{position:sticky;bottom:0;z-index:3;margin-top:10px;padding:12px 16px;border-radius:14px;background:var(--accent);color:var(--on-accent);font-weight:800;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+table{width:100%;border-collapse:collapse}
+td,th{padding:7px 6px;border-bottom:1px solid var(--lines);text-align:left;vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+td.n,th.n{text-align:right;white-space:nowrap}
+tr.sum td{font-weight:800;border-bottom:0}
+.big{font-size:22px;font-weight:900}
+.task{display:grid;grid-template-columns:minmax(0,96px) minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid var(--lines)}
+.who{display:inline-block;margin-top:2px;padding:1px 8px;border-radius:999px;background:var(--hl);font-size:13px;font-weight:700}
+.who.none{background:var(--bad-bg);color:var(--bad)}
+.q{display:grid;grid-template-columns:minmax(0,110px) minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid var(--lines)}
+.q .by{font-weight:800}
+.dd{position:relative;display:inline-block}
+.pop{position:absolute;right:0;top:calc(100% + 6px);z-index:6;display:none;flex-direction:column;gap:6px;padding:10px;min-width:220px;background:var(--surface);border:2px solid var(--lines);border-radius:14px;box-shadow:0 10px 24px var(--shadow)}
+.pop.open{display:flex}
+.pop h4{margin:2px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft)}
+.sw{display:flex;flex-wrap:wrap;gap:6px}
+.sw button{padding:5px 10px;border-radius:10px;background:var(--ground);border:2px solid transparent;font-size:14px}
+.sw button.on{border-color:var(--accent)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+footer{margin-top:28px;color:var(--soft);font-size:13px}
+@media (max-width:560px){
+  .meal,.task,.q{grid-template-columns:minmax(0,1fr);gap:2px}
+  .line{grid-template-columns:40px minmax(0,1fr)}
+  .line .cost{grid-column:2;text-align:left}
+}
+.print-only{display:none}
+@media print{
+  :root{--ground:#fff!important;--surface:#fff!important;--ink:#000!important;--soft:#333!important;--accent:#000!important;--lines:#bbb!important;--hl:#eee!important;--good-bg:#eee!important;--good:#000!important;--bad-bg:#f4f4f4!important;--bad:#000!important;color-scheme:light}
+  @page{margin:13mm}
+  body{font-size:10.5pt;background:#fff}
+  .wrap{padding:0;max-width:none}
+  nav,.tool,.dd,.chips,.total,footer .noprint{display:none!important}
+  .facts{margin:8px 0}
+  .fact{padding:6px 8px}
+  section.panel{display:none!important}
+  body.print-guest #guest,body.print-shop #shop,body.print-plan #plan,body.print-money #money,body.print-questions #questions{display:block!important}
+  body:not([class*="print-"]) section.panel{display:block!important}
+  .card,.line,.meal,.task,.q,tr{break-inside:avoid}
+  .card.splitcard{break-inside:auto}
+  .line{padding:5px 8px;margin-bottom:4px;grid-template-columns:28px minmax(0,1fr) auto}
+  .line .tick{width:18px;height:18px;border-radius:4px;background:#fff!important;color:transparent!important}
+  .line.done{opacity:1} .line.done .what{text-decoration:none}
+  .print-only{display:block}
+  h1{font-size:20pt} .sub{margin:2px 0 0} .head{margin:4px 0 6px} .head h2{font-size:14pt}
+  body[class*="print-"]:not(.print-guest) .facts{display:none}
+  body.print-guest footer,body.print-money footer{display:none}
+  .shared{font-size:8pt}
+  .fact span{font-size:11pt} .fact b{font-size:8pt}
+  .day{break-after:avoid;margin:8px 0 3px}
+  .card{padding:5px 10px;margin-bottom:5px;border-width:1px;border-radius:8px}
+  .meal h3{font-size:11.5pt;margin:0 0 1px}
+  .note,.warnbox{padding:5px 10px;margin:5px 0;border-radius:8px}
+  .line{border-width:1px;border-radius:6px}
+  .why,.flag{font-size:8.5pt}
+  .store{margin:8px 0 2px} .sect{margin:5px 0 2px}
+  td,th{padding:3px 4px}
+  .big{font-size:14pt}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1 id="title"></h1><p class="sub" id="sub"></p></div>
+    <div class="dd"><button class="tool" data-pop="look">Look ▾</button>
+      <div class="pop" id="pop-look"><h4>Colour</h4><div class="sw" id="sw-bg"></div><h4>Letters</h4><div class="sw" id="sw-font"></div></div></div>
+  </div>
+  <div class="facts" id="facts"></div>
+  <nav id="nav" aria-label="Sections"></nav>
+
+  <section class="panel" id="guest"></section>
+  <section class="panel" id="shop"></section>
+  <section class="panel" id="plan"></section>
+  <section class="panel" id="money"></section>
+  <section class="panel" id="questions"></section>
+
+  <footer><span id="built"></span> <span class="noprint">· Ticks are kept in this browser on this device.</span></footer>
+</div>
+
+<script>
+var EVENT = /*__EVENT__*/null;
+(function(){
+"use strict";
+var E = EVENT, root = document.documentElement, $ = function(id){ return document.getElementById(id); };
+var COLOURS = [["auto","Auto"],["snow","Snow"],["sky","Sky"],["pine","Pine"],["sunset","Sunset"],["berry","Berry"],["night","Night"]];
+var FONTS = [["rounded","Rounded"],["clear","Easy to read"],["story","Storybook"],["hand","Handwriting"]];
+var TABS = [["guest","Guest page"],["shop","Shopping list"],["plan","Who does what"],["money","Budget"],["questions","Decide by"]];
+var KEY = "event:" + E.id;
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+var S = load() || {}; S.ticks = S.ticks || {}; S.look = S.look || { bg: E.look.bg, font: E.look.font };
+S.tab = S.tab || "guest"; S.store = S.store || "";
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function cents(s){ return Math.round(parseFloat(s) * 100); }
+function money(c){ var neg = c < 0; c = Math.abs(c); var d = Math.floor(c / 100), r = String(c % 100); if (r.length < 2) r = "0" + r;
+  return (neg ? "-" : "") + E.currency + String(d).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "." + r; }
+function m(s){ return money(cents(s)); }
+
+/* ---------- header ---------- */
+$("title").textContent = E.title; $("sub").textContent = E.subtitle;
+var F = E.facts, gtxt = Object.keys(F.groups).filter(function(g){ return F.groups[g]; }).map(function(g){ return F.groups[g] + " " + g; }).join(" · ");
+$("facts").innerHTML =
+  '<div class="fact"><b>People</b><span>' + F.people + '</span><small>' + esc(gtxt) + '</small></div>' +
+  '<div class="fact"><b>Arrive</b><span>' + esc(F.arrive) + '</span></div>' +
+  '<div class="fact"><b>Leave</b><span>' + esc(F.depart) + '</span>' + (F.nights ? '<small>' + F.nights + ' night' + (F.nights > 1 ? 's' : '') + '</small>' : '') + '</div>' +
+  (F.curfew ? '<div class="fact"><b>Hard stop</b><span>' + esc(F.curfew) + '</span></div>' : '');
+$("built").textContent = "Worked out " + E.builtOn + ". Prices marked with a dot are not confirmed.";
+$("nav").innerHTML = TABS.map(function(t){ return '<button data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join("");
+function head(title, sec, extra){ return '<div class="head"><h2>' + title + '</h2><span>' + (extra || "") + '<button class="tool" data-print="' + sec + '">Print this</button></span></div>'; }
+
+/* ---------- guest page: only what a guest can act on ---------- */
+(function(){
+  var G = E.guest, h = head("Guest page", "guest"), lastDay = "";
+  if (F.where) h += '<p class="muted">' + esc(F.where) + '</p>';
+  if (G.arrival) h += '<div class="note"><b>When you arrive:</b> ' + esc(G.arrival) + '</div>';
+  G.meals.forEach(function(ml){
+    if (ml.day !== lastDay){ h += '<div class="day">' + esc(ml.day) + '</div>'; lastDay = ml.day; }
+    h += '<div class="card meal"><div class="t">' + esc(ml.open || ml.time) + '</div><div><h3>' + esc(ml.name) + '</h3><ul>' +
+      ml.dishes.map(function(d){ return '<li>' + esc(d.dish) + d["for"].map(function(g){ return '<span class="tag">' + esc(g) + '</span>'; }).join("") + '</li>'; }).join("") +
+      '</ul></div></div>';
+  });
+  if (G.drinks.length) h += '<div class="card"><b>Drinks</b><br>' + G.drinks.map(esc).join(" · ") + '</div>';
+  G.notes.forEach(function(n){ h += '<div class="note">' + esc(n) + '</div>'; });
+  $("guest").innerHTML = h;
+})();
+
+/* ---------- shopping list: by store, tick-off, running total ---------- */
+function drawShop(){
+  var h = head("Shopping list", "shop"), stores = E.stores;
+  h += '<div class="chips"><button data-store=""' + (S.store ? '' : ' class="on"') + '>All stores</button>' +
+    stores.map(function(s){ return '<button data-store="' + esc(s.name) + '"' + (S.store === s.name ? ' class="on"' : '') + '>' + esc(s.name) + '</button>'; }).join("") + '</div>';
+  var all = 0, done = 0, nAll = 0, nDone = 0;
+  stores.forEach(function(s){
+    if (S.store && S.store !== s.name) return;
+    h += '<div class="store"><h3>' + esc(s.name) + '</h3><small>' + esc([s.hours, s.phone, s.address].filter(Boolean).join(" · ")) + ' · ' + m(s.total) + '</small></div>';
+    if (s.note) h += '<div class="muted" style="margin-bottom:6px">' + esc(s.note) + '</div>';
+    var lastSect = "";
+    E.lines.filter(function(l){ return l.store === s.name; }).forEach(function(l){
+      if (l.section !== lastSect){ h += '<div class="sect">' + esc(l.section) + '</div>'; lastSect = l.section; }
+      var c = cents(l.cost), on = !!S.ticks[l.id];
+      all += c; nAll++; if (on){ done += c; nDone++; }
+      h += '<div class="line' + (on ? ' done' : '') + '" data-line="' + l.id + '"><button class="tick" data-tick="' + l.id + '" aria-pressed="' + on + '" aria-label="Got ' + esc(l.item) + '">✓</button>' +
+        '<div><div class="what">' + esc(l.item) + (l["for"].length ? l["for"].map(function(g){ return '<span class="tag">' + esc(g) + '</span>'; }).join("") : '') + '</div>' +
+        '<div class="buy">Buy ' + esc(l.buy) + '</div>' +
+        '<div class="why">Need ' + esc(l.need) + ' · ' + esc(l.basis) + '</div>' +
+        (l.note ? '<div class="flag">' + esc(l.note) + '</div>' : '') + '</div>' +
+        '<div class="cost">' + m(l.cost) + (l.check ? '<span class="dot" title="Price not confirmed"></span>' : '') + '</div></div>';
+    });
+  });
+  h += '<div class="total" id="running"><span>' + nDone + ' of ' + nAll + ' in the cart</span><span>' + money(done) + ' of ' + money(all) + '</span></div>';
+  $("shop").innerHTML = h;
+}
+
+/* ---------- who does what ---------- */
+(function(){
+  var h = head("Who does what", "plan"), last = "";
+  if (!E.timeline.length) h += '<p class="muted">No jobs listed yet.</p>';
+  E.timeline.forEach(function(t){
+    if (t.day !== last){ h += '<div class="day">' + esc(t.day) + '</div>'; last = t.day; }
+    h += '<div class="task"><div><b>' + esc(t.time) + '</b></div><div>' + esc(t.what) +
+      (t.warn ? '<div class="flag">' + esc(t.warn) + '</div>' : '') +
+      '<div><span class="who' + (t.who ? '' : ' none') + '">' + esc(t.who || "Nobody yet") + '</span></div></div></div>';
+  });
+  if (E.owned.length) h += '<div class="card" style="margin-top:14px"><b>Already have</b> (don\'t buy or rent these)<br>' + E.owned.map(esc).join(" · ") + '</div>';
+  $("plan").innerHTML = h;
+})();
+
+/* ---------- budget ---------- */
+(function(){
+  var B = E.budget, h = head("Budget", "money");
+  h += '<div class="card"><table><tr><th>What</th><th>Status</th><th class="n">Amount</th></tr>' +
+    B.committed.map(function(c){ return '<tr><td>' + esc(c.what) + '</td><td>' + esc(c.status) + (c.status === "estimate" ? '<span class="dot" title="An estimate, not a quote"></span>' : '') + '</td><td class="n">' + m(c.amount) + '</td></tr>'; }).join("") +
+    '<tr><td>Shopping (every line on the list)</td><td>worked out</td><td class="n">' + m(B.estimated) + '</td></tr>' +
+    '<tr class="sum"><td>Needed</td><td></td><td class="n">' + m(B.required) + '</td></tr>' +
+    (B.payers ? '<tr><td>Collected (' + B.payers + ' × ' + m(B.per_head) + ')</td><td></td><td class="n">' + m(B.collected) + '</td></tr>' : '') +
+    '</table></div>';
+  var gap = cents(B.gap);
+  if (E.split) h += '<div class="warnbox"><span class="big">' + m(E.split.to_collect) + ' still to collect</span><br>Shared fairly below' +
+      (cents(E.split.to_return) ? ', and ' + m(E.split.to_return) + ' to pay back to whoever fronted money.' : '.') + '</div>';
+  else h += gap < 0
+    ? '<div class="note"><span class="big">' + money(-gap) + ' to spare</span><br>What was collected covers everything, with this left over.</div>'
+    : '<div class="warnbox"><span class="big">' + money(gap) + ' short</span><br>That is <b>' + m(B.gap_per) + ' more per ' + esc(B.per_basis) + '</b>.</div>';
+  if (E.split){
+    h += '<h3 style="margin-top:18px">Who owes what</h3><p class="muted">Each bill is shared only by the people it was for: a night\'s campsite by the people there that night, food for one group by that group.</p>' +
+      '<div class="card splitcard"><table><tr><th>Name</th><th class="n">Share</th><th class="n">Already paid</th><th class="n">Still to pay</th></tr>' +
+      E.split.rows.map(function(r){ return '<tr><td>' + esc(r.name) + '</td><td class="n">' + m(r.owes) + '</td><td class="n">' + m(r.paid) + '</td><td class="n">' + (cents(r.balance) < 0 ? 'gets back ' + money(-cents(r.balance)) : m(r.balance)) + '</td></tr>'; }).join("") +
+      '<tr class="sum"><td>Total</td><td class="n">' + m(E.split.charged) + '</td><td></td><td></td></tr></table>' +
+      '<p class="muted shared" style="margin:8px 0 0">Shared out: ' + E.split.buckets.map(function(b){ return esc(b.name) + ' ' + m(b.amount) + ' ÷ ' + b.payers; }).join(" · ") + '. Every cent is accounted for.</p></div>';
+  }
+  $("money").innerHTML = h;
+})();
+
+/* ---------- open questions, by the day they stop being answerable ---------- */
+(function(){
+  var h = head("Decide by", "questions");
+  if (!E.questions.length) h += '<p class="muted">Nothing open.</p>';
+  E.questions.forEach(function(o){
+    var d = o.by ? new Date(o.by + (o.by.indexOf("T") < 0 ? "T12:00" : "")) : null;
+    h += '<div class="q"><div class="by">' + (d ? d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) : '<span class="muted">Not blocking</span>') + '</div>' +
+      '<div>' + esc(o.q) + (o.gates ? '<div class="why">Holds up: ' + esc(o.gates) + '</div>' : '') + '</div></div>';
+  });
+  $("questions").innerHTML = h;
+})();
+
+/* ---------- look, tabs, printing ---------- */
+function swatches(){
+  $("sw-bg").innerHTML = COLOURS.map(function(o){ return '<button data-bg="' + o[0] + '"' + (S.look.bg === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+  $("sw-font").innerHTML = FONTS.map(function(o){ return '<button data-font="' + o[0] + '"' + (S.look.font === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("");
+}
+function applyLook(){ root.setAttribute("data-bg", S.look.bg); root.setAttribute("data-font", S.look.font); swatches(); }
+function tab(t){
+  S.tab = t; save();
+  TABS.forEach(function(x){ $(x[0]).classList.toggle("on", x[0] === t); });
+  var b = document.querySelectorAll("#nav button"); for (var i = 0; i < b.length; i++) b[i].classList.toggle("on", b[i].getAttribute("data-tab") === t);
+}
+window.addEventListener("afterprint", function(){ document.body.className = ""; });
+
+document.addEventListener("click", function(ev){
+  var el = ev.target;
+  while (el && el !== document && !(el.getAttribute && (el.hasAttribute("data-tab") || el.hasAttribute("data-tick") || el.hasAttribute("data-store") || el.hasAttribute("data-print") || el.hasAttribute("data-pop") || el.hasAttribute("data-bg") || el.hasAttribute("data-font")))) el = el.parentNode;
+  if (el === document.documentElement) el = document; /* <html> carries data-font/data-bg for the look: a tap on blank space is not a menu choice */
+  var pop = $("pop-look");
+  if (!el || el === document){ pop.classList.remove("open"); return; }
+  var a = function(n){ return el.getAttribute(n); };
+  if (el.hasAttribute("data-pop")){ pop.classList.toggle("open"); return; }
+  if (el.hasAttribute("data-bg")){ S.look.bg = a("data-bg"); save(); applyLook(); return; }
+  if (el.hasAttribute("data-font")){ S.look.font = a("data-font"); save(); applyLook(); return; }
+  pop.classList.remove("open");
+  if (el.hasAttribute("data-tab")){ tab(a("data-tab")); return; }
+  if (el.hasAttribute("data-tick")){ var id = a("data-tick"); if (S.ticks[id]) delete S.ticks[id]; else S.ticks[id] = 1; save(); drawShop(); return; }
+  if (el.hasAttribute("data-store")){ S.store = a("data-store"); save(); drawShop(); return; }
+  if (el.hasAttribute("data-print")){ document.body.className = "print-" + a("data-print"); window.print(); }
+});
+
+var want = location.hash.slice(1) || S.tab;   // a link ending #shop opens the shopping list
+applyLook(); drawShop(); tab(TABS.some(function(t){ return t[0] === want; }) ? want : "guest");
+setTimeout(function(){ window.scrollTo(0, 0); }, 0);   // a #shop link must not jump past the header
+window.__event = { state: function(){ return S; } };
+})();
+</script>
+</body>
+</html>
